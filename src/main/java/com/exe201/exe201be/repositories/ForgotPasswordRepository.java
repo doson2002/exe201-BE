@@ -1,6 +1,7 @@
 package com.exe201.exe201be.repositories;
 
-import com.example.swp.entities.ForgotPassword;
+
+import com.exe201.exe201be.entities.ForgotPassword;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

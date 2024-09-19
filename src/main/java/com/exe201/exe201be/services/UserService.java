@@ -1,15 +1,17 @@
 package com.exe201.exe201be.services;
-
-import com.example.swp.components.JwtTokenUtils;
-import com.example.swp.dtos.ChangePasswordDTO;
-import com.example.swp.dtos.DataMailDTO;
-import com.example.swp.dtos.UserDTO;
-import com.example.swp.entities.*;
-import com.example.swp.exceptions.DataNotFoundException;
-import com.example.swp.repositories.*;
-import com.example.swp.responses.UserResponse;
-import com.example.swp.services.sendmails.IMailService;
-import com.example.swp.utils.Const;
+import com.exe201.exe201be.components.JwtTokenUtils;
+import com.exe201.exe201be.dtos.ChangePasswordDTO;
+import com.exe201.exe201be.dtos.DataMailDTO;
+import com.exe201.exe201be.dtos.UpdateUserDTO;
+import com.exe201.exe201be.dtos.UserDTO;
+import com.exe201.exe201be.entities.Role;
+import com.exe201.exe201be.entities.Users;
+import com.exe201.exe201be.exceptions.DataNotFoundException;
+import com.exe201.exe201be.repositories.RoleRepository;
+import com.exe201.exe201be.repositories.UserRepository;
+import com.exe201.exe201be.responses.UserResponse;
+import com.exe201.exe201be.services.sendmails.IMailService;
+import com.exe201.exe201be.utils.Const;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -36,10 +38,8 @@ public class UserService implements IUserService{
     private final JwtTokenUtils jwtTokenUtils;
     private final AuthenticationManager authenticationManager;
     private final IMailService mailService;
-    private final CounterRepository counterRepository;
-    private final TokenRepository tokenRepository;
-    private final OrderRepository orderRepository;
-    private final OrderDetailRepository orderDetailRepository;
+    private final ITokenService tokenService;
+
     @Override
     @Transactional
     public Users createUser(UserDTO userDTO) throws Exception {
@@ -51,38 +51,28 @@ public class UserService implements IUserService{
         Role role = roleRepository.findById(userDTO.getRoleId())
                 .orElseThrow(()-> new DataNotFoundException("Fail Role"));
 
-        Long counterId = userDTO.getCounterId();
-
-        Counters counter = null;
-        if (counterId != null) {
-            counter = counterRepository.findById(counterId)
-                    .orElseThrow(() -> new DataNotFoundException("Counter not found with ID: " + counterId));
-        }
-
-
-
 //        if(role.getName().toUpperCase().equals(Role.ADMIN)) {
 //            throw new Exception("Không được phép đăng ký tài khoản Admin");
 //        }
 //        Users currentUser = (Users) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String randomPassword = generateRandomPassword(6,9);
+//        String randomPassword = generateRandomPassword(6,9);
 
         Users newUser = Users.builder()
                 .fullName(userDTO.getFullName())
                 .email(userDTO.getEmail())
                 .phoneNumber(userDTO.getPhoneNumber())
-                .dateOfBirth(userDTO.getDateOfBirth())
+                .password(userDTO.getPassword())
+                .gender(userDTO.getGender())
                 .active(true)
                 .firstLogin(true)
                 .role(role)
-                .counter(counter)
                 .build();
-        String encodedPassword = passwordEncoder.encode(randomPassword);
+        String encodedPassword = passwordEncoder.encode(newUser.getPassword());
         newUser.setPassword(encodedPassword);
-        if (create(userDTO.getFullName(), userDTO.getEmail(), randomPassword))
+//        if (create(userDTO.getFullName(), userDTO.getEmail(), randomPassword))
+//            return userRepository.save(newUser);
+//        else
             return userRepository.save(newUser);
-        else
-            return null;
     }
 
     @Override
@@ -115,52 +105,58 @@ public class UserService implements IUserService{
     public Users getUser(Long id) throws DataNotFoundException {
         return userRepository.findById(id).orElseThrow(()->new DataNotFoundException("User not found"));
     }
-    public List<Users> getUserByRoleAndCounter(Long roleId, Long counterId) throws DataNotFoundException {
+    public List<Users> getUserByRole(Long roleId) throws DataNotFoundException {
         if (!roleRepository.existsById(roleId)) {
             throw new DataNotFoundException("Role not found with id " + roleId);
         }
-        if (counterId!=null && !counterRepository.existsById(counterId)) {
-            throw new DataNotFoundException("Counter not found with id " + counterId);
-        }
-        return userRepository.findByRoleIdAndCounterId(roleId, counterId);
+
+        return userRepository.findByRoleId(roleId);
     }
 
     @Override
-    public Users updateUser(long id, UserDTO userDTO) throws Exception {
-        Users existingUser = userRepository.findUserById(id);
-        if (existingUser == null) {
-            throw new DataNotFoundException("User not found with id:" + id);
-        }
-        Counters existingCounter = null;
-        if ((!userDTO.getRoleId().equals(1L)) &&(!userDTO.getRoleId().equals(2L)) ) {
-            existingCounter = counterRepository.findById(userDTO.getCounterId())
-                    .orElseThrow(() -> new DataNotFoundException("Counter not found with id:" + userDTO.getCounterId()));
-        }
-        Role existingRole = roleRepository.findById(userDTO.getRoleId())
-                .orElseThrow(()-> new DataNotFoundException("Role not found with:"+ userDTO.getRoleId()));
-
-            existingUser.setFullName(userDTO.getFullName());
-            existingUser.setPhoneNumber(userDTO.getPhoneNumber());
-            existingUser.setDateOfBirth(userDTO.getDateOfBirth());
-            existingUser.setEmail(userDTO.getEmail());
-            existingUser.setCounter(existingCounter);
-            existingUser.setRole(existingRole);
-
-            return userRepository.save(existingUser);
-
+        public boolean updateUser(long id, UpdateUserDTO updateUserDTO) throws Exception {
+            Users existingUser = userRepository.findUserById(id);
+            if (existingUser == null) {
+                throw new DataNotFoundException("User not found with id:" + id);
+            }
+            String userEmail = existingUser.getEmail();
+            boolean emailUpdated = false;
+            if(!existingUser.getFullName().equals(updateUserDTO.getFullName())){
+                existingUser.setFullName(updateUserDTO.getFullName());
+            }
+            if(!existingUser.getPhoneNumber().equals(updateUserDTO.getPhoneNumber())){
+                existingUser.setPhoneNumber(updateUserDTO.getPhoneNumber());
+            }
+            if(existingUser.getGender() != updateUserDTO.getGender()){
+                existingUser.setGender(updateUserDTO.getGender());
+            }
+            // Kiểm tra xem email có được thay đổi hay không
+            if (!userEmail.equals(updateUserDTO.getEmail())) {
+                // Email đã thay đổi
+                existingUser.setEmail(updateUserDTO.getEmail());
+                emailUpdated = true;
+                // Xử lý token - xóa token liên quan
+                tokenService.deleteAllTokensForUser(id);
+            }
+            if(!existingUser.getImgUrl().equals(updateUserDTO.getImgUrl())){
+                existingUser.setImgUrl(updateUserDTO.getImgUrl());
+            }
+                 userRepository.save(existingUser);
+                return emailUpdated;
     }
 
-    @Override
-    @Transactional
-    public void deleteUser(Long userId) {
-        Optional<Users> optionalUser = userRepository.findById(userId);
-        List<Token> tokens = tokenRepository.findByUser_Id(userId);
-        List<Orders> orders = orderRepository.findByUser_Id(userId);
-        orderDetailRepository.deleteByOrderIn(orders);
-        tokenRepository.deleteAll(tokens);
-        orderRepository.deleteAll(orders);
-        optionalUser.ifPresent(userRepository::delete);
-    }
+
+//    @Override
+//    @Transactional
+//    public void deleteUser(Long userId) {
+//        Optional<Users> optionalUser = userRepository.findById(userId);
+//        List<Token> tokens = tokenRepository.findByUser_Id(userId);
+//        List<Orders> orders = orderRepository.findByUser_Id(userId);
+//        orderDetailRepository.deleteByOrderIn(orders);
+//        tokenRepository.deleteAll(tokens);
+//        orderRepository.deleteAll(orders);
+//        optionalUser.ifPresent(userRepository::delete);
+//    }
     @Override
     @Transactional
     public void blockOrEnable(Long userId, Boolean active) throws DataNotFoundException {
@@ -171,7 +167,7 @@ public class UserService implements IUserService{
     }
 
 
-    public String login(String email, String password, Long roleId) throws Exception {
+    public String login(String email, String password) throws Exception {
         Optional<Users> optionalUser = userRepository.findByEmail(email);
         if(optionalUser.isEmpty()){
             throw new DataNotFoundException("Invalid user account / password");

@@ -1,8 +1,7 @@
 package com.exe201.exe201be.responses;
 
-import com.example.swp.entities.Counters;
-import com.example.swp.entities.Role;
-import com.example.swp.entities.Users;
+import com.exe201.exe201be.entities.Role;
+import com.exe201.exe201be.entities.Users;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
@@ -13,22 +12,21 @@ import lombok.*;
 @Builder
 public class UserResponse extends BaseResponse{
     private Long id;
-    @JsonProperty("fullname")
+    @JsonProperty("full_name")
     private String fullName;
     @JsonProperty("email")
     private String email;
     @JsonProperty("phone_number")
     private String phoneNumber;
-    @JsonProperty("date_of_birth")
-    private String dateOfBirth;
+    @JsonProperty("gender")
+    private int gender;
     @JsonProperty("active")
     private boolean active;
     @JsonProperty("first_login")
     private Boolean firstLogin;
     @JsonProperty("role")
     private Role role;
-    @JsonProperty("counter")
-    private Counters counter;
+
 
     public static UserResponse fromUser(Users user) {
         UserResponse userResponse = UserResponse.builder()
@@ -36,11 +34,10 @@ public class UserResponse extends BaseResponse{
                 .fullName(user.getFullName())
                 .email(user.getEmail())
                 .phoneNumber(user.getPhoneNumber())
-                .dateOfBirth(user.getDateOfBirth())
+                .gender(user.getGender())
                 .active(user.isActive())
                 .firstLogin(user.getFirstLogin())
                 .role(user.getRole())
-                .counter(user.getCounter() != null ? user.getCounter() : null)
                 .build();
         userResponse.setCreatedDate(user.getCreatedDate());
         userResponse.setModifiedDate(user.getModifiedDate());

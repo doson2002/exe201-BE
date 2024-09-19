@@ -1,9 +1,10 @@
 package com.exe201.exe201be.configurations;
 
-import com.example.swp.entities.Role;
-import com.example.swp.entities.Users;
-import com.example.swp.repositories.RoleRepository;
-import com.example.swp.repositories.UserRepository;
+
+import com.exe201.exe201be.entities.Role;
+import com.exe201.exe201be.entities.Users;
+import com.exe201.exe201be.repositories.RoleRepository;
+import com.exe201.exe201be.repositories.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,8 +16,8 @@ public class DataInitializerConfig {
     CommandLineRunner initDatabase(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
         return args -> {
             initializeRole("Admin", roleRepository);
-            initializeRole("Manager", roleRepository);
-            initializeRole("Staff", roleRepository);
+            initializeRole("Partner", roleRepository);
+            initializeRole("Customer", roleRepository);
 
             userRepository.findByEmail("admin2@gmail.com").orElseGet(() -> {
                 Users adminUser = new Users();
@@ -25,9 +26,9 @@ public class DataInitializerConfig {
                 adminUser.setPassword(passwordEncoder.encode("123456")); // Consider using encoded passwords in production
                 adminUser.setActive(true);
                 adminUser.setFullName("admin 1");
-                adminUser.setPhoneNumber("aaaa");
+                adminUser.setPhoneNumber("123456789");
                 adminUser.setFirstLogin(false);
-                adminUser.setCounter(null);
+                adminUser.setGender(1);
                 adminUser.setRole(adminRole);
                 return userRepository.save(adminUser);
             });

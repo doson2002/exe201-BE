@@ -1,6 +1,5 @@
 package com.exe201.exe201be.responses;
 
-import com.example.swp.entities.Counters;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
@@ -24,11 +23,19 @@ public class LoginResponse {
     //user's detail
     private Long id;
     private String email;
+    private String phone;
+
+    @JsonProperty("img_url")
+    private String imgUrl;
+
+    private int gender;
+
     private String name;
 
     @JsonProperty("first_login")
     private boolean firstLogin;
+
+
     private List<String> roles;
 
-    private Counters counter;
 }

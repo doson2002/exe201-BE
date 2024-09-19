@@ -1,6 +1,6 @@
 package com.exe201.exe201be.configurations;
 
-import com.example.swp.repositories.UserRepository;
+import com.exe201.exe201be.repositories.UserRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,18 +1,21 @@
 package com.exe201.exe201be.controllers;
 
-import com.example.swp.components.JwtTokenUtils;
-import com.example.swp.dtos.ChangePasswordDTO;
-import com.example.swp.dtos.UserDTO;
-import com.example.swp.dtos.UserLoginDTO;
-import com.example.swp.entities.Token;
-import com.example.swp.entities.Users;
-import com.example.swp.exceptions.DataNotFoundException;
-import com.example.swp.responses.LoginResponse;
-import com.example.swp.responses.RegisterResponse;
-import com.example.swp.responses.UserListResponse;
-import com.example.swp.responses.UserResponse;
-import com.example.swp.services.ITokenService;
-import com.example.swp.services.IUserService;
+
+import com.exe201.exe201be.components.JwtTokenUtils;
+import com.exe201.exe201be.dtos.ChangePasswordDTO;
+import com.exe201.exe201be.dtos.UpdateUserDTO;
+import com.exe201.exe201be.dtos.UserDTO;
+import com.exe201.exe201be.dtos.UserLoginDTO;
+import com.exe201.exe201be.entities.Token;
+import com.exe201.exe201be.entities.Users;
+import com.exe201.exe201be.exceptions.DataNotFoundException;
+import com.exe201.exe201be.responses.LoginResponse;
+import com.exe201.exe201be.responses.RegisterResponse;
+import com.exe201.exe201be.responses.UserListResponse;
+import com.exe201.exe201be.responses.UserResponse;
+import com.exe201.exe201be.services.ITokenService;
+import com.exe201.exe201be.services.IUserService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,9 +31,12 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @CrossOrigin("http://www.dodakat.com.s3-website-ap-southeast-1.amazonaws.com")
+@SecurityRequirement(name = "bearer-key")
 @RestController
 @RequestMapping("api/v1/users")
 @RequiredArgsConstructor
@@ -56,8 +62,7 @@ public class UserController {
         try {
             String token = userService.login(
                     userLoginDTO.getEmail(),
-                    userLoginDTO.getPassword(),
-                    userLoginDTO.getRoleId() == null ? 1 : userLoginDTO.getRoleId()
+                    userLoginDTO.getPassword()
             );
             String userAgent = request.getHeader("User-Agent");
 
@@ -72,10 +77,12 @@ public class UserController {
                     .refreshToken(jwtToken.getRefreshToken())
                     .name(userDetail.getFullName())
                     .email(userDetail.getUsername())
+                    .phone(userDetail.getPhoneNumber())
+                    .gender(userDetail.getGender())
+                    .imgUrl(userDetail.getImgUrl())
                     .firstLogin(userDetail.getFirstLogin())
                     .roles(userDetail.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList())
                     .id(userDetail.getId())
-                    .counter(userDetail.getCounter())
                     .build());
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(
@@ -85,7 +92,6 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     public ResponseEntity<?> createUser(@Valid @RequestBody UserDTO userDTO,
                                                 BindingResult result) {
         RegisterResponse registerResponse = new RegisterResponse();
@@ -112,7 +118,7 @@ public class UserController {
     @PutMapping("/update_password/{id}")
     public ResponseEntity<?> updatePassword(@PathVariable long id, @RequestBody ChangePasswordDTO changePasswordDTO) {
         try {
-            Users changePassword = userService.changePassword(id, changePasswordDTO);
+             userService.changePassword(id, changePasswordDTO);
             return ResponseEntity.ok("Update password successfully!!");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -124,7 +130,7 @@ public class UserController {
         public ResponseEntity<UserListResponse> getUsers(
             @RequestParam(defaultValue = "") String keyword,
             @RequestParam("page") int page, @RequestParam("limit") int limit){
-        PageRequest pageRequest = PageRequest.of(page, limit, Sort.by("fullName").ascending());
+        PageRequest pageRequest = PageRequest.of(page, limit);
         Page<UserResponse> userPage = userService.getAllUsers(keyword, pageRequest);
         int totalPages = userPage.getTotalPages();
         List<UserResponse> users = userPage.getContent();
@@ -140,31 +146,42 @@ public class UserController {
         return ResponseEntity.ok(UserResponse.fromUser(user));
     }
 
-    @GetMapping("/get_user_by_role_and_counter")
+    @GetMapping("/get_user_by_role")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_MANAGER')")
-    public ResponseEntity<?>getUsersByRoleAndCounter(
-            @RequestParam(defaultValue = "") Long roleId,
-            @RequestParam(required = false) Long counterId) throws DataNotFoundException {
-        List<Users> users =userService.getUserByRoleAndCounter(roleId, counterId);
+    public ResponseEntity<?>getUsersByRole(
+            @RequestParam(defaultValue = "") Long roleId)
+            throws DataNotFoundException {
+        List<Users> users =userService.getUserByRole(roleId);
         return ResponseEntity.ok(users);
     }
 
 
     @PutMapping("/update/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
-    public ResponseEntity<?> updateUser(@PathVariable long id, @RequestBody UserDTO userDTO) {
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_PARTNER','ROLE_CUSTOMER')")
+    public ResponseEntity<?> updateUser(@PathVariable long id, @RequestBody UpdateUserDTO updateUserDTO) {
         try {
-            userService.updateUser(id, userDTO);
-            return ResponseEntity.ok("Update User successfully");
+            boolean emailUpdated = userService.updateUser(id, updateUserDTO);
+            Map<String, Object> response = new HashMap<>();
+
+            response.put("message", "Update User successfully");
+            // Nếu email đã được cập nhật, trả về thông báo đặc biệt
+            if (emailUpdated) {
+                response.put("emailUpdated", true);  // Trạng thái email đã cập nhật
+                response.put("emailUpdateMessage", "Bạn đã thay đổi email, vui lòng đăng nhập lại.");
+            }
+
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", e.getMessage());
+            return ResponseEntity.badRequest().body(errorResponse);
         }
     }
-    @DeleteMapping("/delete_user/{userId}")
-    public ResponseEntity<String> deleteUser(@PathVariable Long userId) {
-        userService.deleteUser(userId);
-        return new ResponseEntity<>("Users deleted successfully", HttpStatus.OK);
-    }
+//    @DeleteMapping("/delete_user/{userId}")
+//    public ResponseEntity<String> deleteUser(@PathVariable Long userId) {
+//        userService.deleteUser(userId);
+//        return new ResponseEntity<>("Users deleted successfully", HttpStatus.OK);
+//    }
     @PutMapping("/block/{userId}/{active}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<String> blockOrEnable(

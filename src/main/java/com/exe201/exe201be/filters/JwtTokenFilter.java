@@ -1,7 +1,8 @@
 package com.exe201.exe201be.filters;
 
-import com.example.swp.components.JwtTokenUtils;
-import com.example.swp.entities.Users;
+
+import com.exe201.exe201be.components.JwtTokenUtils;
+import com.exe201.exe201be.entities.Users;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -74,11 +75,14 @@ public class JwtTokenFilter extends OncePerRequestFilter{
         final List<Pair<String, String>> bypassTokens = Arrays.asList(
                 Pair.of(String.format("%s/users/generate-secret-key", apiPrefix), "GET"),
                 Pair.of(String.format("%s/users/login", apiPrefix), "POST"),
+                Pair.of(String.format("%s/users/register", apiPrefix), "POST"),
                 Pair.of(String.format("%s/users/refresh-token", apiPrefix), "POST"),
                 Pair.of(String.format("%s/users/update_password/**", apiPrefix), "PUT"),
                 Pair.of(String.format("%s/forgot_password/verify_mail/**", apiPrefix), "POST"),
                 Pair.of(String.format("%s/forgot_password/verify_otp/**", apiPrefix), "POST"),
                 Pair.of(String.format("%s/forgot_password/change_password/**", apiPrefix), "POST"),
+                Pair.of(String.format("%s/payment/vn-pay-callback/**", apiPrefix), "GET"),
+
                 Pair.of("/api-docs","GET"),
                 Pair.of("/api-docs/**","GET"),
                 Pair.of("/swagger-resources","GET"),

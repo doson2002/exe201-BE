@@ -1,11 +1,12 @@
 package com.exe201.exe201be.controllers;
 
-import com.example.swp.dtos.ChangePasswordDTO;
-import com.example.swp.dtos.OtpDTO;
-import com.example.swp.exceptions.DataNotFoundException;
-import com.example.swp.repositories.UserRepository;
-import com.example.swp.services.ForgotPasswordService;
-import com.example.swp.services.IUserService;
+
+import com.exe201.exe201be.dtos.ChangePasswordDTO;
+import com.exe201.exe201be.dtos.OtpDTO;
+import com.exe201.exe201be.exceptions.DataNotFoundException;
+import com.exe201.exe201be.repositories.UserRepository;
+import com.exe201.exe201be.services.ForgotPasswordService;
+import com.exe201.exe201be.services.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

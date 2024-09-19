@@ -1,10 +1,11 @@
 package com.exe201.exe201be.services;
 
-import com.example.swp.dtos.ChangePasswordDTO;
-import com.example.swp.dtos.UserDTO;
-import com.example.swp.entities.Users;
-import com.example.swp.exceptions.DataNotFoundException;
-import com.example.swp.responses.UserResponse;
+import com.exe201.exe201be.dtos.ChangePasswordDTO;
+import com.exe201.exe201be.dtos.UpdateUserDTO;
+import com.exe201.exe201be.dtos.UserDTO;
+import com.exe201.exe201be.entities.Users;
+import com.exe201.exe201be.exceptions.DataNotFoundException;
+import com.exe201.exe201be.responses.UserResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
@@ -17,11 +18,11 @@ public interface IUserService {
 
     Users getUser(Long id) throws DataNotFoundException;
 
-    List<Users> getUserByRoleAndCounter(Long roleId, Long counterId) throws DataNotFoundException;
+    List<Users> getUserByRole(Long roleId) throws DataNotFoundException;
 
-    void deleteUser(Long userId);
+//    void deleteUser(Long userId);
 
-    String login(String userAccount, String password,Long roleId) throws Exception;
+    String login(String userAccount, String password) throws Exception;
 
     Boolean create(String name, String email, String password);
 
@@ -31,7 +32,7 @@ public interface IUserService {
     Users getUserDetailsFromToken(String token) throws Exception;
     void blockOrEnable(Long userId, Boolean active) throws DataNotFoundException;
 
-    Users updateUser(long id, UserDTO userDTO) throws Exception;
+    boolean updateUser(long id, UpdateUserDTO updateUserDTO) throws Exception;
 
     void updatePassword(String email, String password) throws DataNotFoundException;
 }

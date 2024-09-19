@@ -1,8 +1,8 @@
-package com.example.swp.components;
+package com.exe201.exe201be.components;
 
-import com.example.swp.entities.Users;
-import com.example.swp.entities.Token;
-import com.example.swp.repositories.TokenRepository;
+import com.exe201.exe201be.entities.Token;
+import com.exe201.exe201be.entities.Users;
+import com.exe201.exe201be.repositories.TokenRepository;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.io.Encoders;
