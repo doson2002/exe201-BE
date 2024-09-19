@@ -1,0 +1,43 @@
+version: "2.2"
+
+services:
+  db:
+    container_name: db_container
+    image: postgres:latest
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=123456789
+      - POSTGRES_DB=exe201
+    volumes:
+      - db:/var/lib/postgresql/data
+    networks:
+      - my-network
+
+  app:
+    container_name: exe201-api-container
+    image: doson200220/exe201
+    depends_on:
+      - db
+    build:
+      context: .
+      dockerfile: dockerfile
+    ports:
+      - 8080:8080
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/exe201?serverTimezone=UTC&allowPublicKeyRetrieval=true
+      PGADMIN_USER: postgres
+      PGADMIN_PASSWORD: 123456789
+
+    networks:
+      - my-network
+
+
+volumes:
+  db:
+networks:
+  my-network:
+    driver: bridge
+

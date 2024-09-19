@@ -1,6 +1,7 @@
 package com.exe201.exe201be.repositories;
 
-import com.example.swp.entities.Users;
+
+import com.exe201.exe201be.entities.Users;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,21 +19,23 @@ public interface UserRepository extends JpaRepository<Users,Long> {
     boolean existsByEmail(String email);
 
     @Query("SELECT u FROM Users u WHERE " +
-            "(:keyword IS NULL OR :keyword = '' OR u.fullName ILIKE %:keyword%)")
+            "(:keyword IS NULL OR :keyword = '' OR u.fullName ILIKE %:keyword%) " +
+            "ORDER BY u.fullName ASC")
     Page<Users> searchUsers(@Param("keyword") String keyword, Pageable pageable);
 
     Optional<Users> findByEmail(String email);
 
     Users findUserById(long id);
 
-    @Query("SELECT u FROM Users u WHERE u.role.id = :roleId AND (:counterId IS NULL OR u.counter.id = :counterId)")
-    List<Users> findByRoleIdAndCounterId(@Param("roleId") Long roleId, @Param("counterId") Long counterId);
+    @Query("SELECT u FROM Users u WHERE u.role.id = :roleId ")
+    List<Users> findByRoleId(@Param("roleId") Long roleId);
+
     @Transactional
     @Modifying
     @Query("update Users u set u.password = ?2 where u.email = ?1")
     void updatePassword(String email, String password);
 
-    void deleteByCounterId(Long counterId);
+
 
 
 

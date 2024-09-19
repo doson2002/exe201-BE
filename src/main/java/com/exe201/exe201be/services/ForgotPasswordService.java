@@ -1,12 +1,13 @@
 package com.exe201.exe201be.services;
 
-import com.example.swp.dtos.DataMailDTO;
-import com.example.swp.entities.ForgotPassword;
-import com.example.swp.entities.Users;
-import com.example.swp.repositories.ForgotPasswordRepository;
-import com.example.swp.repositories.UserRepository;
-import com.example.swp.services.sendmails.MailService;
-import com.example.swp.utils.Const;
+
+import com.exe201.exe201be.dtos.DataMailDTO;
+import com.exe201.exe201be.entities.ForgotPassword;
+import com.exe201.exe201be.entities.Users;
+import com.exe201.exe201be.repositories.ForgotPasswordRepository;
+import com.exe201.exe201be.repositories.UserRepository;
+import com.exe201.exe201be.services.sendmails.MailService;
+import com.exe201.exe201be.utils.Const;
 import jakarta.mail.MessagingException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

@@ -1,6 +1,6 @@
 package com.exe201.exe201be.configurations;
 
-import com.example.swp.filters.JwtTokenFilter;
+import com.exe201.exe201be.filters.JwtTokenFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -38,10 +38,12 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                             .requestMatchers(
                                     String.format("%s/users/register", apiPrefix),
                                     String.format("%s/users/login", apiPrefix),
+                                    String.format("%s/users/register", apiPrefix),
                                     String.format("%s/users/update_password/**", apiPrefix),
                                     String.format("%s/forgot_password/verify_mail/**", apiPrefix),
                                     String.format("%s/forgot_password/verify_otp/**", apiPrefix),
                                     String.format("%s/forgot_password/change_password/**", apiPrefix),
+                                    String.format("%s/payment/vn-pay-callback/**", apiPrefix),
                                     "/api-docs",
                                     "/api-docs/**",
                                     "/swagger-resources",

@@ -2,6 +2,7 @@ package com.exe201.exe201be.dtos;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
@@ -12,7 +13,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserDTO {
-    @JsonProperty("fullname")
+    @JsonProperty("full_name")
     private String fullName;
 
     @JsonProperty("email")
@@ -21,13 +22,17 @@ public class UserDTO {
     @JsonProperty("phone_number")
     private String phoneNumber;
 
-    @JsonProperty("date_of_birth")
-    private String dateOfBirth;
+    @JsonProperty("password")
+    private String password;
 
-    @NotNull(message = "Role ID is required")
+    @JsonProperty("gender")
+    private int gender;
+
+    @JsonProperty("img_url")
+    private String imgUrl;
+
     @JsonProperty("role_id")
     private Long roleId;
 
-    @JsonProperty("counter_id")
-    private Long counterId;
+
 }

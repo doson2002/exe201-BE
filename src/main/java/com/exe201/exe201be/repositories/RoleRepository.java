@@ -1,6 +1,7 @@
 package com.exe201.exe201be.repositories;
 
-import com.example.swp.entities.Role;
+
+import com.exe201.exe201be.entities.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

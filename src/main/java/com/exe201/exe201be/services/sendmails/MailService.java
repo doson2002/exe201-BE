@@ -1,6 +1,6 @@
 package com.exe201.exe201be.services.sendmails;
 
-import com.example.swp.dtos.DataMailDTO;
+import com.exe201.exe201be.dtos.DataMailDTO;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;

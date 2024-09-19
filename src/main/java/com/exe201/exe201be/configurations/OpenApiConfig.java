@@ -10,9 +10,9 @@ import org.springframework.context.annotation.Configuration;
 
 @OpenAPIDefinition(
         info = @Info(
-                title = "Jewelry Sales",
+                title = "FOODPT",
                 version = "1.0.0",
-                description = "Ứng dụng quản lý nhân viên"
+                description = "Ứng dụng quản lý FOODPT"
         ),
         servers = {
                 @Server(url = "http://localhost:8080", description = "Local Development Server"),

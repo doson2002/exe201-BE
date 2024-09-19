@@ -1,12 +1,12 @@
 package com.exe201.exe201be.services;
 
 
-import com.example.swp.components.JwtTokenUtils;
-import com.example.swp.entities.Token;
-import com.example.swp.entities.Users;
-import com.example.swp.exceptions.DataNotFoundException;
-import com.example.swp.exceptions.ExpiredTokenException;
-import com.example.swp.repositories.TokenRepository;
+import com.exe201.exe201be.components.JwtTokenUtils;
+import com.exe201.exe201be.entities.Token;
+import com.exe201.exe201be.entities.Users;
+import com.exe201.exe201be.exceptions.DataNotFoundException;
+import com.exe201.exe201be.exceptions.ExpiredTokenException;
+import com.exe201.exe201be.repositories.TokenRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -93,5 +93,11 @@ public class TokenService implements ITokenService{
         } else {
             throw new RuntimeException("Token not found.");
         }
+    }
+
+    @Transactional // Chắc chắn rằng việc xóa được thực hiện trong giao dịch
+    @Override
+    public void deleteAllTokensForUser(Long userId) {
+         tokenRepository.deleteByUser_Id(userId);
     }
 }

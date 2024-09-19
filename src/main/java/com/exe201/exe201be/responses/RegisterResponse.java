@@ -1,6 +1,6 @@
 package com.exe201.exe201be.responses;
 
-import com.example.swp.entities.Users;
+import com.exe201.exe201be.entities.Users;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 

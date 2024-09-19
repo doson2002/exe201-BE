@@ -23,7 +23,7 @@ public class Users extends BaseEntity implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "fullname", length = 100)
+    @Column(name = "full_name", length = 100)
     private String fullName;
 
     @Column(name = "email", length = 100)
@@ -32,22 +32,20 @@ public class Users extends BaseEntity implements UserDetails {
     @Column(name = "phone_number", length = 10, nullable = false)
     private String phoneNumber;
 
-
     @Column(name = "password", length = 200, nullable = false)
     private String password;
 
     @Column(name = "is_active")
     private boolean active;
 
-    @Column(name = "date_of_birth")
-    private String dateOfBirth;
+    @Column(name = "gender")
+    private int gender;
+
+    @Column(name = "img_url")
+    private String imgUrl;
 
     @Column(name = "first_login")
     private Boolean firstLogin;
-
-    @ManyToOne
-    @JoinColumn(name = "counter_id", nullable = true)
-    private Counters counter;
 
     @OneToOne(mappedBy = "user")
     private ForgotPassword forgotPassword;
