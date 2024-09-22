@@ -15,6 +15,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
@@ -77,7 +78,7 @@ public class FoodItemController {
 //    }
 
     @GetMapping("/get_all_food_items")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_PARTNER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_PARTNER','ROLE_CUSTOMER')")
     public ResponseEntity<FoodItemResponseList> getAllFoodItems(
             @RequestParam(defaultValue = "")String keyword){
         List<FoodItemResponse> foodItemResponseList = foodItemService.getAllFoodItem(keyword);
@@ -91,8 +92,7 @@ public class FoodItemController {
         FoodItem foodItem = foodItemService.getFoodItem(foodItemId);
         return ResponseEntity.ok(FoodItemResponse.fromFoodItem(foodItem));
     }
-
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_PARTNER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_PARTNER','ROLE_CUSTOMER')")
     @GetMapping("/get_food_item_by_supplier/{supplierId}")
     public ResponseEntity<?> getFoodItemBySupplierId(@PathVariable Long supplierId) {
         List<FoodItem> foodItemList = foodItemService.getFoodItemBySupplierId(supplierId);
@@ -102,7 +102,7 @@ public class FoodItemController {
         return ResponseEntity.ok(foodItemResponseList);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_PARTNER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_PARTNER','ROLE_CUSTOMER')")
     @GetMapping("/get_food_item_by_food_type/{foodTypeId}")
     public ResponseEntity<?> getFoodItemByFoodTypeId(@PathVariable Long foodTypeId) {
         List<FoodItem> foodItemList = foodItemService.getFoodItemByFoodTypeId(foodTypeId);
@@ -110,6 +110,20 @@ public class FoodItemController {
                 .map(FoodItemResponse::fromFoodItem)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(foodItemResponseList);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_PARTNER')")
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> deleteFoodItem(@PathVariable("id") Long foodItemId) {
+        try {
+            // Gọi Service để xóa FoodItem
+            foodItemService.deleteFoodItem(foodItemId);
+            // Trả về phản hồi thành công
+            return ResponseEntity.ok("Xóa món ăn thành công với ID: " + foodItemId);
+        } catch (Exception e) {
+            // Xử lý lỗi khi xóa không thành công
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi khi xóa món ăn: " + e.getMessage());
+        }
     }
 
 }

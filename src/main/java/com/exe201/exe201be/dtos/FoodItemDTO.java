@@ -23,6 +23,9 @@ public class FoodItemDTO {
     @JsonProperty(value = "price")
     private double price;
 
+    @JsonProperty(value = "description")
+    private String description;
+
     @JsonProperty(value = "status")
     private String status;   //('available', 'pending', 'collected')
 

@@ -17,12 +17,16 @@ public class FoodOrder {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "user_id")
     private Users user;
 
     @Column(name = "order_time")
     private Date orderTime;
+
+    @ManyToOne
+    @JoinColumn(name = "supplier_info_id")
+    private SupplierInfo supplierInfo;
 
     @Column(name = "estimated_pickup_time")
     private Date estimatedPickupTime;

@@ -3,6 +3,9 @@ package com.exe201.exe201be.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalTime;
+import java.util.Date;
+
 @Entity
 @Getter
 @Setter
@@ -31,8 +34,22 @@ public class SupplierInfo {
     @Column(name = "img_url")
     private String imgUrl;
 
-    @Column(name = "slogan")
-    private String slogan;
+    @Column(name = "total_star_rating")
+    private double totalStarRating;
+
+    @Column(name = "total_review_count")
+    private int totalReviewCount;
+
+    @ManyToOne
+    @JoinColumn(name = "supplier_type_id")
+    private SupplierType supplierType;
+
+    // Thêm thời gian mở cửa và đóng cửa
+    @Column(name = "open_time")
+    private LocalTime openTime;
+
+    @Column(name = "close_time")
+    private LocalTime closeTime;
 
 
 

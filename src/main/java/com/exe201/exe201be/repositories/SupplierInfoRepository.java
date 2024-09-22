@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface SupplierInfoRepository extends JpaRepository<SupplierInfo, Long> {
 
@@ -16,4 +18,6 @@ public interface SupplierInfoRepository extends JpaRepository<SupplierInfo, Long
     Page<SupplierInfo> searchSupplierInfo(@Param("keyword") String keyword, Pageable pageable);
 
     SupplierInfo findByUser_id(Long userId);
+
+    List<SupplierInfo> findAllBySupplierType_Id(Long supplierTypeId);
 }

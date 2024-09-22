@@ -22,7 +22,7 @@ public class FoodItemResponse {
     @JsonProperty(value = "food_name")
     private String foodName;
 
-
+    private String description;
 
     @JsonProperty(value = "quantity")
     private  int quantity;
@@ -61,6 +61,7 @@ public class FoodItemResponse {
                 .price(foodItem.getPrice())
                 .quantity(foodItem.getQuantity())
                 .supplierInfo(foodItem.getSupplierInfo())
+                .description(foodItem.getDescription())
                 .imageUrl(foodItem.getImgUrl())
                 .status(foodItem.getStatus())
                 .readyTime(foodItem.getReadyTime())
