@@ -16,6 +16,8 @@ public interface IFoodItemService {
 
     FoodItem getFoodItem(Long id) throws DataNotFoundException;
     List<FoodItemResponse> getAllFoodItem(String keyword);
+
+    void deleteFoodItem(Long foodItemId);
     List<FoodItem> getFoodItemBySupplierId(Long supplierId);
 
     List<FoodItem> getFoodItemByFoodTypeId(Long foodTypeId);

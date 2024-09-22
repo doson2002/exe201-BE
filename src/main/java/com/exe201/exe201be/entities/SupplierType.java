@@ -6,11 +6,11 @@ import lombok.*;
 @Entity
 @Getter
 @Setter
-@Table(name = "food_type")
+@Table(name = "supplier_type")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class FoodType {
+public class SupplierType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -18,8 +18,6 @@ public class FoodType {
     @Column(name = "type_name", length = 100, nullable = false)
     private String typeName;
 
-    @ManyToOne
-    @JoinColumn(name = "supplier_info_id")
-    private SupplierInfo supplierInfo;
-    private int i;
+    @Column(name = "img_url", columnDefinition = "TEXT")
+    private String imgUrl;
 }

@@ -7,6 +7,7 @@ import com.exe201.exe201be.exceptions.DataNotFoundException;
 import com.exe201.exe201be.repositories.*;
 import com.exe201.exe201be.responses.FoodItemResponse;
 import com.exe201.exe201be.responses.SupplierInfoResponse;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -34,6 +35,7 @@ public class FoodItemService implements IFoodItemService{
                 .price(foodItemDTO.getPrice())
                 .quantity(foodItemDTO.getQuantity())
                 .supplierInfo(existingSupplier)
+                .description(foodItemDTO.getDescription())
                 .imgUrl(foodItemDTO.getImageUrl())
                 .status(foodItemDTO.getStatus())
                 .readyTime(foodItemDTO.getReadyTime())
@@ -62,43 +64,53 @@ public class FoodItemService implements IFoodItemService{
         return savedFoodItem;
     }
 
+    @Transactional
+    public void deleteExistingFoodItemTypes(FoodItem foodItem) {
+        foodItemTypeRepository.deleteByFoodItem(foodItem);
+    }
+
+    @Transactional
+    public void addNewFoodItemTypes(FoodItem foodItem, List<Long> foodTypeIds) throws DataNotFoundException {
+        for (Long foodTypeId : foodTypeIds) {
+            FoodType foodType = foodTypeRepository.findById(foodTypeId)
+                    .orElseThrow(() -> new DataNotFoundException("Cannot find food type id " + foodTypeId));
+
+            FoodItemType foodItemType = FoodItemType.builder()
+                    .foodItem(foodItem)
+                    .foodType(foodType)
+                    .build();
+
+            foodItemTypeRepository.save(foodItemType);
+        }
+    }
+
+    @Transactional
     @Override
+    // Trong hàm updateFoodItem, tách biệt hai quá trình trên
     public FoodItem updateFoodItem(Long id, FoodItemDTO foodItemDTO) throws DataNotFoundException {
         FoodItem existingFoodItem = foodItemRepository.findById(id)
-                .orElseThrow(()->new DataNotFoundException("Food item cannot find with id"+ id));
-            SupplierInfo existingSupplier = supplierInfoRepository.findById(foodItemDTO.getSupplierId())
-                    .orElseThrow(()-> new DataNotFoundException("Cannot find supplier with id "+foodItemDTO.getSupplierId()));
-            existingFoodItem.setFoodName(foodItemDTO.getFoodName());
-            existingFoodItem.setPrice(foodItemDTO.getPrice());
-            existingFoodItem.setQuantity(foodItemDTO.getQuantity());
-            existingFoodItem.setImgUrl(foodItemDTO.getImageUrl());
-//            existingFoodItem.setSupplierInfo(existingSupplier);
-            existingFoodItem.setStatus(foodItemDTO.getStatus());
-            existingFoodItem.setReadyTime(foodItemDTO.getReadyTime());
-            existingFoodItem.setModifiedDate(new Date());
-            existingFoodItem.setCategory(foodItemDTO.getCategory());
-        // Xử lý cập nhật FoodType (mối quan hệ nhiều-nhiều thông qua bảng trung gian)
-        if (foodItemDTO.getFoodTypeIds() != null && !foodItemDTO.getFoodTypeIds().isEmpty()) {
-            // Xóa các bản ghi FoodItemType hiện tại liên kết với FoodItem
-            foodItemTypeRepository.deleteByFoodItem(existingFoodItem);
+                .orElseThrow(() -> new DataNotFoundException("Food item cannot find with id" + id));
 
-            // Tạo lại các liên kết mới dựa trên foodTypeIds từ DTO
-            for (Long foodTypeId : foodItemDTO.getFoodTypeIds()) {
-                FoodType foodType = foodTypeRepository.findById(foodTypeId)
-                        .orElseThrow(() -> new DataNotFoundException("Cannot find food type id " + foodTypeId));
+        existingFoodItem.setFoodName(foodItemDTO.getFoodName());
+        existingFoodItem.setPrice(foodItemDTO.getPrice());
+        existingFoodItem.setQuantity(foodItemDTO.getQuantity());
+        existingFoodItem.setImgUrl(foodItemDTO.getImageUrl());
+        existingFoodItem.setDescription(foodItemDTO.getDescription());
+        existingFoodItem.setStatus(foodItemDTO.getStatus());
+//        existingFoodItem.setReadyTime(foodItemDTO.getReadyTime());
+        existingFoodItem.setModifiedDate(new Date());
+        existingFoodItem.setCategory(foodItemDTO.getCategory());
 
-                FoodItemType foodItemType = FoodItemType.builder()
-                        .foodItem(existingFoodItem)
-                        .foodType(foodType)
-                        .build();
+        // Xóa các bản ghi FoodItemType hiện tại liên quan đến FoodItem
+        deleteExistingFoodItemTypes(existingFoodItem);
 
-                foodItemTypeRepository.save(foodItemType);
-            }
-        }
+        // Thêm các liên kết mới dựa trên foodTypeIds từ DTO
+        addNewFoodItemTypes(existingFoodItem, foodItemDTO.getFoodTypeIds());
 
-        // Lưu FoodItem đã được cập nhật
         return foodItemRepository.save(existingFoodItem);
     }
+
+
 
     public FoodItem getFoodItem(Long id) throws DataNotFoundException {
         return foodItemRepository.findById(id).orElseThrow(()->new DataNotFoundException("Food item not found with id:" + id));
@@ -127,6 +139,12 @@ public class FoodItemService implements IFoodItemService{
                 .collect(Collectors.toList());
 
         return foodItems;
+    }
+
+    @Override
+    @Transactional
+    public void deleteFoodItem(Long foodItemId) {
+        foodItemRepository.deleteById(foodItemId);
     }
 
 }

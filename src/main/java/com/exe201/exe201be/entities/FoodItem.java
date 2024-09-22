@@ -23,6 +23,8 @@ public class FoodItem extends BaseEntity{
     @JoinColumn(name = "supplier_id")
     private SupplierInfo supplierInfo;
 
+    @Column(name = "description")
+    private String description;
 
     @Column(name = "food_name")
     private String foodName;

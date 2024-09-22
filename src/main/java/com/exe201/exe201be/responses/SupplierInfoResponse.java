@@ -1,9 +1,12 @@
 package com.exe201.exe201be.responses;
 
 import com.exe201.exe201be.entities.SupplierInfo;
+import com.exe201.exe201be.entities.SupplierType;
 import com.exe201.exe201be.entities.Users;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
+
+import java.time.LocalTime;
 
 @Getter
 @Setter
@@ -26,20 +29,38 @@ public class SupplierInfoResponse {
     @JsonProperty(value = "img_url")
     private String imgUrl;
 
-    @JsonProperty(value = "slogan")
-    private String slogan;
+    @JsonProperty(value = "total_star_rating")
+    private double totalStarRating;
+
+    @JsonProperty(value = "total_review_count")
+    private int totalReviewCount;
+
+    @JsonProperty(value = "supplier_type")
+    private SupplierType supplierType;
 
     @JsonProperty(value = "user_id")
     private Users user;
+
+    @JsonProperty(value = "close_time")
+    private LocalTime closeTime;
+
+    @JsonProperty(value = "open_time")
+    private LocalTime openTime;
+
+
 
     public static SupplierInfoResponse fromSupplierInfo(SupplierInfo supplierInfo) {
         SupplierInfoResponse supplierInfoResponse = SupplierInfoResponse.builder()
                 .id(supplierInfo.getId())
                 .restaurantName(supplierInfo.getRestaurantName())
                 .description(supplierInfo.getDescription())
-                .slogan(supplierInfo.getSlogan())
+                .totalReviewCount(supplierInfo.getTotalReviewCount())
+                .totalStarRating(supplierInfo.getTotalStarRating())
+                .supplierType(supplierInfo.getSupplierType())
                 .address(supplierInfo.getAddress())
                 .imgUrl(supplierInfo.getImgUrl())
+                .closeTime(supplierInfo.getCloseTime())
+                .openTime(supplierInfo.getOpenTime())
                 .user(supplierInfo.getUser())
                 .build();
         return supplierInfoResponse;

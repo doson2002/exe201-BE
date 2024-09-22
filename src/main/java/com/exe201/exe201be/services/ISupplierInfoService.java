@@ -7,6 +7,9 @@ import com.exe201.exe201be.responses.SupplierInfoResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
+import java.time.LocalTime;
+import java.util.List;
+
 public interface ISupplierInfoService {
     SupplierInfo createSupplierInfo(SupplierInfoDTO supplierInfoDTO) throws DataNotFoundException;
     SupplierInfo updateSupplier(Long id, SupplierInfoDTO supplierInfoDTO) throws DataNotFoundException;
@@ -16,4 +19,7 @@ public interface ISupplierInfoService {
     Page<SupplierInfoResponse> getAllSuppliers(String keyword, PageRequest pageRequest);
 
     SupplierInfo getSupplierByUserId(Long userId);
+
+    List<SupplierInfo> getSupplierInfoBySupplierTypeId(Long supplierTypeId);
+    void updateTimeOfRestaurant(Long id, LocalTime openTime, LocalTime closeTime) throws DataNotFoundException;
 }

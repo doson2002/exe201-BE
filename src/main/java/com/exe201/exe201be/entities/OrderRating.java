@@ -6,7 +6,7 @@ import lombok.*;
 @Entity
 @Getter
 @Setter
-@Table(name = "food_order")
+@Table(name = "order_rating")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -18,9 +18,6 @@ public class OrderRating extends BaseEntity{
     @OneToOne
     @JoinColumn(name = "food_order_id")
     private FoodOrder foodOrder;
-
-    @Column(name = "img_url")
-    private String imgUrl;
 
     @Column(name = "rating_star")
     private int ratingStar;
