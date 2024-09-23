@@ -5,10 +5,7 @@ import com.exe201.exe201be.dtos.SupplierInfoDTO;
 import com.exe201.exe201be.entities.FoodItem;
 import com.exe201.exe201be.entities.SupplierInfo;
 import com.exe201.exe201be.exceptions.DataNotFoundException;
-import com.exe201.exe201be.responses.FoodItemResponse;
-import com.exe201.exe201be.responses.FoodItemResponseList;
-import com.exe201.exe201be.responses.SupplierInfoResponse;
-import com.exe201.exe201be.responses.SupplierInfoResponseList;
+import com.exe201.exe201be.responses.*;
 import com.exe201.exe201be.services.IFoodItemService;
 import com.exe201.exe201be.services.ISupplierInfoService;
 import jakarta.validation.Valid;
@@ -56,8 +53,9 @@ public class FoodItemController {
     public ResponseEntity<?> updateFoodItem(@PathVariable Long id,
                                             @Valid @RequestBody FoodItemDTO foodItemDTO){
         try{
-            FoodItem updateFoodItem = foodItemService.updateFoodItem(id, foodItemDTO);
-            return ResponseEntity.ok(updateFoodItem);
+            FoodItem updatedFoodItem = foodItemService.updateFoodItem(id, foodItemDTO);
+            UpdateFoodItemResponse response = UpdateFoodItemResponse.fromUpdateFoodItem(updatedFoodItem);
+            return ResponseEntity.ok(response);
         }catch(Exception e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }
