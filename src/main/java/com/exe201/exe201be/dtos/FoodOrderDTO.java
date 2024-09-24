@@ -16,8 +16,8 @@ public class FoodOrderDTO {
     @JsonProperty(value = "order_time")
     private Date orderTime;
 
-    @JsonProperty(value = "estimated_pickup_time")
-    private Date estimatedPickupTime;
+    @JsonProperty(value = "pickup_time")
+    private Date pickupTime;
 
     @JsonProperty(value = "pickup_location")
     private String pickupLocation;

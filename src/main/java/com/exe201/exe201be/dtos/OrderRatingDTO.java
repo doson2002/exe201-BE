@@ -11,13 +11,16 @@ import lombok.*;
 @NoArgsConstructor
 public class OrderRatingDTO {
 
-    @JsonProperty(value = "food_order_id")
-    private Long foodOrderId;
+    @JsonProperty(value = "supplier_id")
+    private Long supplierId;
 
     @JsonProperty(value = "rating_star")
     private int ratingStar;
 
     @JsonProperty(value = "response_message")
     private String responseMessage;
+
+    @JsonProperty(value = "user_id")
+    private Long userId;
 
 }

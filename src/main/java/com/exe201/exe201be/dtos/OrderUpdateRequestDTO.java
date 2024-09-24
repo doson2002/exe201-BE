@@ -15,8 +15,8 @@ public class OrderUpdateRequestDTO {
 
     private String status;  // Trạng thái đơn hàng: 'pending', 'confirmed', 'completed'
 
-    @JsonProperty("estimated_pickup_time")
-    private Date estimatedPickupTime;
+    @JsonProperty("pickup_time")
+    private Date PickupTime;
 
     @JsonProperty("payment_method")
     private String paymentMethod;  // Phương thức thanh toán (ví dụ: 'cash', 'credit_card')

@@ -19,8 +19,8 @@ public class FoodOrderResponse {
     @JsonProperty(value = "order_time")
     private Date orderTime;
 
-    @JsonProperty(value = "estimated_pickup_time")
-    private Date estimatedPickupTime;
+    @JsonProperty(value = "pickup_time")
+    private Date pickupTime;
 
     @JsonProperty(value = "pickup_location")
     private String pickupLocation;
@@ -43,7 +43,7 @@ public class FoodOrderResponse {
         FoodOrderResponse orderResponse = FoodOrderResponse.builder()
                 .id(foodOrder.getId())
                 .orderTime(foodOrder.getOrderTime())
-                .estimatedPickupTime(foodOrder.getEstimatedPickupTime())
+                .pickupTime(foodOrder.getPickupTime())
                 .pickupLocation(foodOrder.getPickupLocation())
                 .status(foodOrder.getStatus())
                 .paymentMethod(foodOrder.getPaymentMethod())

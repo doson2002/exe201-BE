@@ -113,7 +113,7 @@ public class SupplierInfoController {
                 .build());
     }
     @GetMapping("/get_supplier_by_id/{supplierId}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_PARTNER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_PARTNER','ROLE_CUSTOMER')")
     public ResponseEntity<?> getProduct(@Valid @PathVariable Long supplierId) throws DataNotFoundException {
         SupplierInfo supplier = supplierInfoService.getSupplierInfo(supplierId);
         return ResponseEntity.ok(SupplierInfoResponse.fromSupplierInfo(supplier));
