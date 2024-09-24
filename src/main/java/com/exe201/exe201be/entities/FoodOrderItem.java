@@ -21,7 +21,7 @@ public class FoodOrderItem {
     @JoinColumn(name = "food_order_id")
     private FoodOrder foodOrder;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "food_item_id")
     private FoodItem foodItem;
 

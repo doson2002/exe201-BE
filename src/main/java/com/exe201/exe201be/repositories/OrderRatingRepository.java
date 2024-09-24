@@ -9,5 +9,5 @@ import java.util.List;
 
 @Repository
 public interface OrderRatingRepository extends JpaRepository<OrderRating,Long> {
-    List<OrderRating> findAllByFoodOrder_SupplierInfo_Id(Long supplierInfoId);
+    List<OrderRating> findBySupplierInfo_Id(Long supplierInfoId);
 }

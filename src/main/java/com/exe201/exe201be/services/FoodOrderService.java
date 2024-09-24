@@ -35,7 +35,7 @@ public class FoodOrderService implements IFoodOrderService{
                 .orElseThrow(() -> new DataNotFoundException("Customer not found"));
         FoodOrder foodOrder = new FoodOrder();
         foodOrder.setOrderTime(foodOrderDTO.getOrderTime());
-        foodOrder.setEstimatedPickupTime(foodOrderDTO.getEstimatedPickupTime());
+        foodOrder.setPickupTime(foodOrderDTO.getPickupTime());
         foodOrder.setPickupLocation(foodOrderDTO.getPickupLocation());
         foodOrder.setStatus(foodOrder.getStatus());
         foodOrder.setUser(ExistingCustomer);
@@ -144,10 +144,9 @@ public class FoodOrderService implements IFoodOrderService{
         if (updateRequestDTO.getPaymentStatus() != null) {
             existingOrder.setPaymentStatus(updateRequestDTO.getPaymentStatus());
         }
-        if (updateRequestDTO.getEstimatedPickupTime() != null) {
-            existingOrder.setEstimatedPickupTime(updateRequestDTO.getEstimatedPickupTime());
+        if (updateRequestDTO.getPickupTime() != null) {
+            existingOrder.setPickupTime(updateRequestDTO.getPickupTime());
         }
-
 
         foodOrderRepository.save(existingOrder);
     }

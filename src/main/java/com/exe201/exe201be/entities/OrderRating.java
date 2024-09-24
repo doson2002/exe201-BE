@@ -15,13 +15,17 @@ public class OrderRating extends BaseEntity{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "food_order_id")
-    private FoodOrder foodOrder;
-
     @Column(name = "rating_star")
     private int ratingStar;
 
     @Column(name = "response_message",columnDefinition = "TEXT")
     private String responseMessage;
+
+    @ManyToOne
+    @JoinColumn(name = "supplier_id")
+    private SupplierInfo supplierInfo;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private Users users;
 }

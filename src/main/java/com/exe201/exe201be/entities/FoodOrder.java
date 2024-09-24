@@ -28,8 +28,8 @@ public class FoodOrder {
     @JoinColumn(name = "supplier_info_id")
     private SupplierInfo supplierInfo;
 
-    @Column(name = "estimated_pickup_time")
-    private Date estimatedPickupTime;
+    @Column(name = "pickup_time")
+    private Date pickupTime;
 
     @Column(name = "pickup_location")
     private String pickupLocation;
