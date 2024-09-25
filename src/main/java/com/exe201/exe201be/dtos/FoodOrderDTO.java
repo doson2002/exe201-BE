@@ -33,4 +33,7 @@ public class FoodOrderDTO {
 
     @JsonProperty(value = "user_id")
     private Long userId;
+
+    @JsonProperty(value = "supplier_id")
+    private Long supplierId;
 }

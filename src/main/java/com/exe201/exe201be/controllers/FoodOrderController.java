@@ -6,9 +6,7 @@ import com.exe201.exe201be.entities.FoodOrderItem;
 import com.exe201.exe201be.exceptions.DataNotFoundException;
 import com.exe201.exe201be.repositories.FoodOrderItemRepository;
 import com.exe201.exe201be.repositories.FoodOrderRepository;
-import com.exe201.exe201be.responses.CreateOrderResponse;
-import com.exe201.exe201be.responses.FoodOrderResponse;
-import com.exe201.exe201be.responses.FoodOrderResponseList;
+import com.exe201.exe201be.responses.*;
 import com.exe201.exe201be.services.IFoodOrderItemService;
 import com.exe201.exe201be.services.IFoodOrderService;
 import jakarta.validation.Valid;
@@ -20,6 +18,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,7 +33,7 @@ public class FoodOrderController {
 
 
     @PostMapping("/create")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_STAFF','ROLE_MANAGER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_PARTNER','ROLE_CUSTOMER')")
     public ResponseEntity<?> createOrder(@Valid @RequestBody OrderRequestDetailDTO request,
                                          BindingResult result) {
 
@@ -60,15 +59,15 @@ public class FoodOrderController {
     }
 
     @GetMapping("/get_food_order_by_id/{orderId}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_MANAGER','ROLE_STAFF')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_PARTNER','ROLE_CUSTOMER')")
     public ResponseEntity<?> getFoodOrder(@Valid @PathVariable Long orderId) throws DataNotFoundException {
-        FoodOrder foodOrder = foodOrderService.getFoodOrderById(orderId);
-        List<FoodOrderItem> foodOrderItemList = foodOrderItemRepository.findByFoodOrderId(foodOrder.getId());
-        return ResponseEntity.ok(FoodOrderResponse.fromFoodOrders(foodOrder, foodOrderItemList));
+        FoodOrderDetailResponse foodOrderDetailResponse = foodOrderService.getFoodOrderDetailById(orderId);
+        return ResponseEntity.ok(foodOrderDetailResponse);
     }
 
+
     @GetMapping("/get_all_food_orders")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_STAFF','ROLE_MANAGER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_PARTNER','ROLE_CUSTOMER')")
     public ResponseEntity<FoodOrderResponseList> getAllOrders() {
 
         List<FoodOrder> orders = foodOrderService.getAllFoodOrders();
@@ -77,16 +76,23 @@ public class FoodOrderController {
     }
 
     @GetMapping("/get_food_order_by_userId/{userId}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_MANAGER')")
-    public ResponseEntity<FoodOrderResponseList> getFoodOrdersByUser(@Valid @PathVariable Long userId) {
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_PARTNER','ROLE_CUSTOMER')")
+    public ResponseEntity<?> getFoodOrdersByUser(@Valid @PathVariable Long userId) {
 
         List<FoodOrder> orders = foodOrderService.getFoodOrdersByUserId(userId);
-
-        return getFoodOrderResponseListResponseEntity(orders);
+        // Sắp xếp danh sách theo thuộc tính pickup_time giảm dần
+        List<FoodOrderResponse> foodOrderResponseList = orders.stream()
+                .sorted(Comparator.comparing(FoodOrder::getId).reversed()) // Sắp xếp giảm dần theo pickup_time
+                .map(FoodOrderResponse::fromFoodOrders)
+                .collect(Collectors.toList());
+         return ResponseEntity.ok(foodOrderResponseList);
     }
 
+
+
+
     @PutMapping("/update_order_status/{orderId}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_MANAGER','ROLE_STAFF')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_PARTNER','ROLE_CUSTOMER')")
     public ResponseEntity<?> updateFoodOrderStatus(@Valid @PathVariable Long orderId,
                                                    @RequestBody String orderStatus){
         try {
@@ -102,7 +108,7 @@ public class FoodOrderController {
         List<FoodOrderResponse> orderResponses = orders.stream()
                 .map(order -> {
                     List<FoodOrderItem> orderItems = foodOrderItemRepository.findByFoodOrderId(order.getId());
-                    return FoodOrderResponse.fromFoodOrders(order, orderItems);
+                    return FoodOrderResponse.fromFoodOrders(order);
                 })
                 .collect(Collectors.toList());
 

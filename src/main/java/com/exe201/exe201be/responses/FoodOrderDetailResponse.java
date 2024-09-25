@@ -1,7 +1,6 @@
 package com.exe201.exe201be.responses;
 
 import com.exe201.exe201be.entities.FoodOrder;
-import com.exe201.exe201be.entities.FoodOrderItem;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
@@ -13,11 +12,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class FoodOrderResponse {
-
+public class FoodOrderDetailResponse {
     private Long id;
-    @JsonProperty(value = "order_time")
-    private Date orderTime;
 
     @JsonProperty(value = "pickup_time")
     private Date pickupTime;
@@ -34,35 +30,19 @@ public class FoodOrderResponse {
     @JsonProperty(value = "payment_status")
     private int paymentStatus;
 
-    @JsonProperty(value = "user_id")
-    private Long userId;
+    private List<FoodOrderItemResponse> foodOrderItemResponseList;
 
-    @JsonProperty(value = "supplier_name")
-    private String supplierName;
 
-    @JsonProperty(value = "supplier_image_url")
-    private String supplierImageUrl;
 
-    @JsonProperty(value = "total_items")
-    private int totalItems;
-
-    @JsonProperty(value = "total_price")
-    private double totalPrice;
-
-    public static FoodOrderResponse fromFoodOrders(FoodOrder foodOrder) {
-        FoodOrderResponse orderResponse = FoodOrderResponse.builder()
+    public static FoodOrderDetailResponse fromFoodOrders(FoodOrder foodOrder, List<FoodOrderItemResponse> foodOrderItemResponseList) {
+        FoodOrderDetailResponse orderResponse = FoodOrderDetailResponse.builder()
                 .id(foodOrder.getId())
-                .supplierName(foodOrder.getSupplierInfo().getRestaurantName())
-                .orderTime(foodOrder.getOrderTime())
                 .pickupTime(foodOrder.getPickupTime())
                 .pickupLocation(foodOrder.getPickupLocation())
                 .status(foodOrder.getStatus())
                 .paymentMethod(foodOrder.getPaymentMethod())
-                .userId(foodOrder.getUser().getId())
                 .paymentStatus(foodOrder.getPaymentStatus())
-                .supplierImageUrl(foodOrder.getSupplierInfo().getImgUrl())
-                .totalPrice(foodOrder.getTotalPrice())
-                .totalItems(foodOrder.getTotalItems())
+                .foodOrderItemResponseList(foodOrderItemResponseList)
 
                 .build();
         return orderResponse;

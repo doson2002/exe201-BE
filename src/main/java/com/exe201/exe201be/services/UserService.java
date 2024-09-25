@@ -63,6 +63,7 @@ public class UserService implements IUserService{
                 .phoneNumber(userDTO.getPhoneNumber())
                 .password(userDTO.getPassword())
                 .gender(userDTO.getGender())
+                .imgUrl(userDTO.getImgUrl())
                 .active(true)
                 .firstLogin(true)
                 .role(role)
@@ -138,9 +139,12 @@ public class UserService implements IUserService{
                 // Xử lý token - xóa token liên quan
                 tokenService.deleteAllTokensForUser(id);
             }
-            if(!existingUser.getImgUrl().equals(updateUserDTO.getImgUrl())){
-                existingUser.setImgUrl(updateUserDTO.getImgUrl());
-            }
+        if ((existingUser.getImgUrl() == null && updateUserDTO.getImgUrl() != null) ||
+                (existingUser.getImgUrl() != null && !existingUser.getImgUrl().equals(updateUserDTO.getImgUrl()))) {
+
+            existingUser.setImgUrl(updateUserDTO.getImgUrl());
+        }
+
                  userRepository.save(existingUser);
                 return emailUpdated;
     }

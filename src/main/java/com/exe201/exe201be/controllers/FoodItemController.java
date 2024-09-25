@@ -84,6 +84,16 @@ public class FoodItemController {
                 .foodItems(foodItemResponseList)
                 .build());
     }
+    @GetMapping("/get_food_items_grouped_by_supplierId")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_PARTNER','ROLE_CUSTOMER')")
+    public ResponseEntity<?> getAllFoodItemsGroupedBySupplierId(
+            @RequestParam(defaultValue = "") String keyword) {
+
+        // Gọi service để lấy danh sách nhóm theo Supplier
+        List<SupplierWithFoodItemsResponse> supplierWithFoodItemsList = foodItemService.getAllFoodItemGroupedBySupplier(keyword);
+
+        return ResponseEntity.ok(supplierWithFoodItemsList);
+    }
     @GetMapping("/get_food_item_by_id/{foodItemId}")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_PARTNER')")
     public ResponseEntity<?> getFoodItem(@Valid @PathVariable Long foodItemId) throws DataNotFoundException {
@@ -108,6 +118,13 @@ public class FoodItemController {
                 .map(FoodItemResponse::fromFoodItem)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(foodItemResponseList);
+    }
+
+    @GetMapping("/get_all_food_item_names")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_PARTNER','ROLE_CUSTOMER')")
+    public ResponseEntity<List<String>> getAllFoodItemNames(@RequestParam String keyword) {
+        List<String> foodItemNames = foodItemService.getAllFoodItemNames(keyword);
+        return ResponseEntity.ok(foodItemNames);
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_PARTNER')")
