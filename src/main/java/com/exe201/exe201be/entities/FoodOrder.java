@@ -34,6 +34,12 @@ public class FoodOrder {
     @Column(name = "pickup_location")
     private String pickupLocation;
 
+    @Column(name = "total_price")
+    private double totalPrice;
+
+    @Column(name = "total_items")
+    private int totalItems;
+
     @Column(name = "status")
     private String status;  //('pending', 'confirmed', 'completed')
 

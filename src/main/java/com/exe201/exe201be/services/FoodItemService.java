@@ -6,15 +6,19 @@ import com.exe201.exe201be.entities.*;
 import com.exe201.exe201be.exceptions.DataNotFoundException;
 import com.exe201.exe201be.repositories.*;
 import com.exe201.exe201be.responses.FoodItemResponse;
+import com.exe201.exe201be.responses.FoodItemResponseWithSupplier;
 import com.exe201.exe201be.responses.SupplierInfoResponse;
+import com.exe201.exe201be.responses.SupplierWithFoodItemsResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -129,6 +133,8 @@ public class FoodItemService implements IFoodItemService{
     public List<FoodItem> getFoodItemBySupplierId(Long supplierId){
         return foodItemRepository.findBySupplierInfo_Id(supplierId);
     }
+
+
     public List<FoodItem> getFoodItemByFoodTypeId(Long foodTypeId) {
         // Tìm danh sách FoodItemType liên kết với foodTypeId
         List<FoodItemType> foodItemTypes = foodItemTypeRepository.findByFoodTypeId(foodTypeId);
@@ -139,6 +145,31 @@ public class FoodItemService implements IFoodItemService{
                 .collect(Collectors.toList());
 
         return foodItems;
+    }
+
+    public List<SupplierWithFoodItemsResponse> getAllFoodItemGroupedBySupplier(String keyword) {
+        List<FoodItem> foodItemList = foodItemRepository.searchFoodItem(keyword);
+
+        // Sử dụng Stream API để chuyển từ FoodItem sang FoodItemResponse
+        List<FoodItemResponseWithSupplier> foodItemResponseList = foodItemList.stream()
+                .map(FoodItemResponseWithSupplier::fromFoodItem)
+                .collect(Collectors.toList());
+
+        // Nhóm FoodItemResponse theo SupplierInfo
+        Map<SupplierInfo, List<FoodItemResponseWithSupplier>> groupedBySupplier = foodItemResponseList.stream()
+                .collect(Collectors.groupingBy(FoodItemResponseWithSupplier::getSupplierInfo));
+
+        // Chuyển đổi từ Map sang List<SupplierWithFoodItems>
+        List<SupplierWithFoodItemsResponse> supplierWithFoodItemsList = new ArrayList<>();
+        groupedBySupplier.forEach((supplier, foodItems) -> {
+            supplierWithFoodItemsList.add(new SupplierWithFoodItemsResponse(supplier, foodItems));
+        });
+
+        return supplierWithFoodItemsList;
+    }
+
+    public List<String> getAllFoodItemNames(String keyword) {
+        return foodItemRepository.findAllFoodItemNames(keyword);
     }
 
     @Override
