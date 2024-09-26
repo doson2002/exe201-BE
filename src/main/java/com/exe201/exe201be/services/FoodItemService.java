@@ -37,7 +37,7 @@ public class FoodItemService implements IFoodItemService{
                 .builder()
                 .foodName(foodItemDTO.getFoodName())
                 .price(foodItemDTO.getPrice())
-                .quantity(foodItemDTO.getQuantity())
+                .quantitySold(foodItemDTO.getQuantitySold())
                 .supplierInfo(existingSupplier)
                 .description(foodItemDTO.getDescription())
                 .imgUrl(foodItemDTO.getImageUrl())
@@ -97,7 +97,7 @@ public class FoodItemService implements IFoodItemService{
 
         existingFoodItem.setFoodName(foodItemDTO.getFoodName());
         existingFoodItem.setPrice(foodItemDTO.getPrice());
-        existingFoodItem.setQuantity(foodItemDTO.getQuantity());
+        existingFoodItem.setQuantitySold(foodItemDTO.getQuantitySold());
         existingFoodItem.setImgUrl(foodItemDTO.getImageUrl());
         existingFoodItem.setDescription(foodItemDTO.getDescription());
         existingFoodItem.setStatus(foodItemDTO.getStatus());

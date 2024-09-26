@@ -17,8 +17,8 @@ public class FoodItemDTO {
     @JsonProperty(value = "food_name")
     private String foodName;
 
-    @JsonProperty(value = "quantity")
-    private  int quantity;
+    @JsonProperty(value = "quantity_sold")
+    private  int quantitySold;
 
     @JsonProperty(value = "price")
     private double price;

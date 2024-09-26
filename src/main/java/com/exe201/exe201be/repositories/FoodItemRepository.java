@@ -22,4 +22,7 @@ public interface FoodItemRepository extends JpaRepository<FoodItem, Long> {
 
     @Query("SELECT f.foodName FROM FoodItem f WHERE LOWER(f.foodName) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     List<String> findAllFoodItemNames(@Param("keyword") String keyword);
+
+    @Query(value = "SELECT f FROM FoodItem f ORDER BY f.quantitySold DESC")
+    List<FoodItem> findTopSellingProducts(@Param("limit") int limit);
 }

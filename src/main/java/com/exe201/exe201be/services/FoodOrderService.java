@@ -49,8 +49,8 @@ public class FoodOrderService implements IFoodOrderService{
             foodOrderItem.setFoodItem(foodItem);
             foodOrderItem.setQuantity(orderRequest.getQuantity());
             // Update the food item stock
-            var newQuantity = foodItem.getQuantity() - orderRequest.getQuantity();
-            foodItem.setQuantity(newQuantity);
+            var newQuantity = foodItem.getQuantitySold() + orderRequest.getQuantity();
+            foodItem.setQuantitySold(newQuantity);
             foodOrder.setTotalItems(foodOrderItem.getQuantity());
 
             totalPrice += foodOrderItem.getQuantity() * foodItem.getPrice();

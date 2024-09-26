@@ -22,8 +22,8 @@ public class UpdateFoodItemResponse {
 
     private String description;
 
-    @JsonProperty(value = "quantity")
-    private  int quantity;
+    @JsonProperty(value = "quantity_sold")
+    private  int quantitySold;
 
     @JsonProperty(value = "price")
     private double price;
@@ -49,7 +49,7 @@ public class UpdateFoodItemResponse {
                 .id(foodItem.getId())
                 .foodName(foodItem.getFoodName())
                 .price(foodItem.getPrice())
-                .quantity(foodItem.getQuantity())
+                .quantitySold(foodItem.getQuantitySold())
                 .description(foodItem.getDescription())
                 .imageUrl(foodItem.getImgUrl())
                 .status(foodItem.getStatus())
