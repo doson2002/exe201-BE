@@ -29,8 +29,8 @@ public class FoodItem extends BaseEntity{
     @Column(name = "food_name")
     private String foodName;
 
-    @Column(name = "quantity")
-    private int quantity;
+    @Column(name = "quantity_sold")
+    private int quantitySold;
 
     @Column(name = "price")
     private double price;

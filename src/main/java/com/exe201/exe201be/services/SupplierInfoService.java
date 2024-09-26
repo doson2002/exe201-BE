@@ -32,7 +32,7 @@ public class SupplierInfoService implements ISupplierInfoService {
 
         SupplierInfo newSupplierInfo = new SupplierInfo();
 
-        if (!supplierInfoDTO.getRestaurantName().isEmpty()){
+        if (!supplierInfoDTO.getRestaurantName().isEmpty()&&supplierInfoDTO.getRestaurantName()!=null){
             newSupplierInfo.setRestaurantName(supplierInfoDTO.getRestaurantName());
         }
         if (!supplierInfoDTO.getDescription().isEmpty()){
