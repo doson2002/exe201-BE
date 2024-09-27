@@ -27,6 +27,10 @@ public class FoodItemResponse {
     @JsonProperty(value = "quantity_sold")
     private  int quantitySold;
 
+    @JsonProperty(value = "inventory_quantity")
+    private int inventoryQuantity;
+
+
     @JsonProperty(value = "price")
     private double price;
 
@@ -41,6 +45,9 @@ public class FoodItemResponse {
 
     @JsonProperty(value = "category")
     private String category;//("fee required","free")
+
+    @JsonProperty(value = "is_offered")
+    private int isOffered;
 
     @JsonProperty(value = "supplier_info")
     private SupplierInfo supplierInfo;
@@ -60,9 +67,11 @@ public class FoodItemResponse {
                 .foodName(foodItem.getFoodName())
                 .price(foodItem.getPrice())
                 .quantitySold(foodItem.getQuantitySold())
+                .inventoryQuantity(foodItem.getInventoryQuantity())
                 .supplierInfo(foodItem.getSupplierInfo())
                 .description(foodItem.getDescription())
                 .imageUrl(foodItem.getImgUrl())
+                .isOffered(foodItem.getIsOffered())
                 .status(foodItem.getStatus())
                 .readyTime(foodItem.getReadyTime())
                 .category(foodItem.getCategory())

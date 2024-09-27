@@ -12,7 +12,7 @@ import java.util.List;
 
 public interface ISupplierInfoService {
     SupplierInfo createSupplierInfo(SupplierInfoDTO supplierInfoDTO) throws DataNotFoundException;
-    SupplierInfo updateSupplier(Long id, SupplierInfoDTO supplierInfoDTO) throws DataNotFoundException;
+    void updateSupplier(Long id, SupplierInfoDTO supplierInfoDTO) throws DataNotFoundException;
 
     SupplierInfo getSupplierInfo(Long id) throws DataNotFoundException;
 

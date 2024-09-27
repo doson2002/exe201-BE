@@ -29,6 +29,9 @@ public class FoodItem extends BaseEntity{
     @Column(name = "food_name")
     private String foodName;
 
+    @Column(name = "inventory_quantity")
+    private int inventoryQuantity;
+
     @Column(name = "quantity_sold")
     private int quantitySold;
 
@@ -42,10 +45,13 @@ public class FoodItem extends BaseEntity{
     private String imgUrl;
 
     @Column(name = "ready_time")
-    private Date readyTime;
+    private Date readyTime = new Date();
 
     @Column(name = "category")
     private String category; //category("fee required","free")
+
+    @Column(name = "is_offered")
+    private int isOffered = 0;
 
     @OneToMany(mappedBy = "foodItem", cascade = CascadeType.ALL)
     private List<FoodItemType> foodItemTypes;

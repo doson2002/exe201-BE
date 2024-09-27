@@ -57,10 +57,23 @@ public class SupplierInfoController {
     public ResponseEntity<?> updateSupplier(@PathVariable Long id,
                                            @Valid @RequestBody SupplierInfoDTO supplierInfoDTO){
         try{
-            SupplierInfo updateSupplier = supplierInfoService.updateSupplier(id, supplierInfoDTO);
-            return ResponseEntity.ok(updateSupplier);
-        }catch(Exception e){
-            return ResponseEntity.badRequest().body(e.getMessage());
+            supplierInfoService.updateSupplier(id, supplierInfoDTO);
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", "success");
+            response.put("message", "Cập nhật SupplierInfo thành công với ID: " + id);
+            response.put("data", supplierInfoDTO); // Trả về dữ liệu đã cập nhật
+            return ResponseEntity.ok(response);
+        }catch(DataNotFoundException e){
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("status", "error");
+            errorResponse.put("message", "Lỗi: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        }catch (Exception e){
+            // Tạo đối tượng phản hồi lỗi cho các lỗi khác
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("status", "error");
+            errorResponse.put("message", "Lỗi khi cập nhật SupplierInfo: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
 
