@@ -17,6 +17,9 @@ public class FoodItemDTO {
     @JsonProperty(value = "food_name")
     private String foodName;
 
+    @JsonProperty(value = "inventory_quantity")
+    private int inventoryQuantity;
+
     @JsonProperty(value = "quantity_sold")
     private  int quantitySold;
 
@@ -32,11 +35,9 @@ public class FoodItemDTO {
     @JsonProperty(value = "image_url")
     private String imageUrl;
 
-    @JsonProperty(value = "ready_time")
-    private Date readyTime;
-
     @JsonProperty(value = "category")
     private String category;//("fee required","free")
+
 
     @JsonProperty(value = "supplier_id")
     private Long supplierId;

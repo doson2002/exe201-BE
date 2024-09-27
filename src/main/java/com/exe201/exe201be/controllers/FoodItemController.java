@@ -2,6 +2,7 @@ package com.exe201.exe201be.controllers;
 
 import com.exe201.exe201be.dtos.FoodItemDTO;
 import com.exe201.exe201be.dtos.SupplierInfoDTO;
+import com.exe201.exe201be.dtos.UpdateTimeRequestDTO;
 import com.exe201.exe201be.entities.FoodItem;
 import com.exe201.exe201be.entities.SupplierInfo;
 import com.exe201.exe201be.exceptions.DataNotFoundException;
@@ -19,7 +20,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -75,6 +78,39 @@ public class FoodItemController {
 //                .build());
 //    }
 
+    @PutMapping("/update_offered_status/{id}")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_PARTNER')")
+    public ResponseEntity<?> updateOfferedStatus(
+            @PathVariable Long id,
+             @RequestParam int isOffered) {
+        try {
+            // Gọi service để cập nhật thời gian mở/đóng cửa
+            foodItemService.updateOfferedStatus(id, isOffered);
+
+            // Tạo đối tượng phản hồi (Response) với các thông tin chi tiết
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", "success");
+            response.put("message", "Cập nhật offered status thành công với ID: " + id);
+            response.put("data", isOffered); // Trả về dữ liệu đã cập nhật
+
+            return ResponseEntity.ok(response);
+        } catch (DataNotFoundException e) {
+            // Tạo đối tượng phản hồi lỗi khi không tìm thấy thông tin
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("status", "error");
+            errorResponse.put("message", "Lỗi: " + e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        } catch (Exception e) {
+            // Tạo đối tượng phản hồi lỗi cho các lỗi khác
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("status", "error");
+            errorResponse.put("message", "Lỗi khi thay đổi trạng thái đề xuất món ăn: " + e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
+
     @GetMapping("/get_all_food_items")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_PARTNER','ROLE_CUSTOMER')")
     public ResponseEntity<FoodItemResponseList> getAllFoodItems(
@@ -94,6 +130,18 @@ public class FoodItemController {
 
         return ResponseEntity.ok(supplierWithFoodItemsList);
     }
+
+    @GetMapping("/get_food_items_by_offered_status/{supplierId}")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_PARTNER','ROLE_CUSTOMER')")
+    public ResponseEntity<?> getAllFoodItemsByOfferedStatus(
+            @Valid @PathVariable Long supplierId,
+            @RequestParam int isOffered) {
+
+        List<FoodItemOfferedResponse> foodItemOfferedResponseList = foodItemService.getAllFoodItemOffered(supplierId, isOffered);
+
+        return ResponseEntity.ok(foodItemOfferedResponseList);
+    }
+
     @GetMapping("/get_food_item_by_id/{foodItemId}")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_PARTNER')")
     public ResponseEntity<?> getFoodItem(@Valid @PathVariable Long foodItemId) throws DataNotFoundException {

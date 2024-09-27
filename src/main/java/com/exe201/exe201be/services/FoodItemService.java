@@ -5,10 +5,7 @@ import com.exe201.exe201be.dtos.SupplierInfoDTO;
 import com.exe201.exe201be.entities.*;
 import com.exe201.exe201be.exceptions.DataNotFoundException;
 import com.exe201.exe201be.repositories.*;
-import com.exe201.exe201be.responses.FoodItemResponse;
-import com.exe201.exe201be.responses.FoodItemResponseWithSupplier;
-import com.exe201.exe201be.responses.SupplierInfoResponse;
-import com.exe201.exe201be.responses.SupplierWithFoodItemsResponse;
+import com.exe201.exe201be.responses.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -37,12 +34,14 @@ public class FoodItemService implements IFoodItemService{
                 .builder()
                 .foodName(foodItemDTO.getFoodName())
                 .price(foodItemDTO.getPrice())
-                .quantitySold(foodItemDTO.getQuantitySold())
+                .quantitySold(0)
+                .inventoryQuantity(foodItemDTO.getInventoryQuantity())
                 .supplierInfo(existingSupplier)
                 .description(foodItemDTO.getDescription())
                 .imgUrl(foodItemDTO.getImageUrl())
+                .isOffered(0)
                 .status(foodItemDTO.getStatus())
-                .readyTime(foodItemDTO.getReadyTime())
+                .readyTime(new Date())
                 .category(foodItemDTO.getCategory())
                 .build();
 
@@ -99,6 +98,7 @@ public class FoodItemService implements IFoodItemService{
         existingFoodItem.setPrice(foodItemDTO.getPrice());
         existingFoodItem.setQuantitySold(foodItemDTO.getQuantitySold());
         existingFoodItem.setImgUrl(foodItemDTO.getImageUrl());
+        existingFoodItem.setInventoryQuantity(foodItemDTO.getInventoryQuantity());
         existingFoodItem.setDescription(foodItemDTO.getDescription());
         existingFoodItem.setStatus(foodItemDTO.getStatus());
 //        existingFoodItem.setReadyTime(foodItemDTO.getReadyTime());
@@ -112,6 +112,15 @@ public class FoodItemService implements IFoodItemService{
         addNewFoodItemTypes(existingFoodItem, foodItemDTO.getFoodTypeIds());
 
         return foodItemRepository.save(existingFoodItem);
+    }
+
+    public void updateOfferedStatus(Long id, int isOffered) throws DataNotFoundException {
+        FoodItem existingFoodItem = foodItemRepository.findById(id)
+                .orElseThrow(() -> new DataNotFoundException("Food item cannot find with id" + id));
+        if(existingFoodItem!=null){
+            existingFoodItem.setIsOffered(isOffered);
+            foodItemRepository.save(existingFoodItem);
+        }
     }
 
 
@@ -130,6 +139,14 @@ public class FoodItemService implements IFoodItemService{
 
         return foodItemResponseList;
     }
+
+    public List<FoodItemOfferedResponse> getAllFoodItemOffered(Long supplierId, int isOffered) {
+        List<FoodItem> foodItemList = foodItemRepository.findBySupplierInfo_IdAndIsOffered(supplierId, isOffered);
+        List<FoodItemOfferedResponse> foodItemOfferedResponseList = foodItemList.stream()
+                .map(FoodItemOfferedResponse::fromFoodItem) // Map từng FoodItem sang FoodItemResponse
+                .collect(Collectors.toList());
+        return foodItemOfferedResponseList;
+    }
     public List<FoodItem> getFoodItemBySupplierId(Long supplierId){
         return foodItemRepository.findBySupplierInfo_Id(supplierId);
     }
@@ -146,6 +163,7 @@ public class FoodItemService implements IFoodItemService{
 
         return foodItems;
     }
+
 
     public List<SupplierWithFoodItemsResponse> getAllFoodItemGroupedBySupplier(String keyword) {
         List<FoodItem> foodItemList = foodItemRepository.searchFoodItem(keyword);
@@ -167,6 +185,8 @@ public class FoodItemService implements IFoodItemService{
 
         return supplierWithFoodItemsList;
     }
+
+
 
     public List<String> getAllFoodItemNames(String keyword) {
         return foodItemRepository.findAllFoodItemNames(keyword);

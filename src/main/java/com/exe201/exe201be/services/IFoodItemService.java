@@ -3,6 +3,7 @@ package com.exe201.exe201be.services;
 import com.exe201.exe201be.dtos.FoodItemDTO;
 import com.exe201.exe201be.entities.FoodItem;
 import com.exe201.exe201be.exceptions.DataNotFoundException;
+import com.exe201.exe201be.responses.FoodItemOfferedResponse;
 import com.exe201.exe201be.responses.FoodItemResponse;
 import com.exe201.exe201be.responses.SupplierWithFoodItemsResponse;
 import org.springframework.data.domain.Page;
@@ -25,4 +26,7 @@ public interface IFoodItemService {
     List<SupplierWithFoodItemsResponse> getAllFoodItemGroupedBySupplier(String keyword);
 
     List<String> getAllFoodItemNames(String keyword);
+
+    void updateOfferedStatus(Long id, int isOffered) throws DataNotFoundException;
+    List<FoodItemOfferedResponse> getAllFoodItemOffered(Long supplierId, int isOffered);
 }

@@ -25,4 +25,6 @@ public interface FoodItemRepository extends JpaRepository<FoodItem, Long> {
 
     @Query(value = "SELECT f FROM FoodItem f ORDER BY f.quantitySold DESC")
     List<FoodItem> findTopSellingProducts(@Param("limit") int limit);
+
+    List<FoodItem> findBySupplierInfo_IdAndIsOffered(Long supplierId, int isOffered);
 }

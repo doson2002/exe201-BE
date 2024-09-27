@@ -57,39 +57,41 @@ public class SupplierInfoService implements ISupplierInfoService {
     }
 
     @Override
-    public SupplierInfo updateSupplier(Long id, SupplierInfoDTO supplierInfoDTO) throws DataNotFoundException {
+    public void updateSupplier(Long id, SupplierInfoDTO supplierInfoDTO) throws DataNotFoundException {
         SupplierInfo existingSupplier = supplierInfoRepository.findById(id)
                 .orElseThrow(()->new DataNotFoundException("Supplier infomation cannot find with id"+ id));
-        SupplierType existingSupplierType = supplierTypeRepository.findById(supplierInfoDTO.getSupplierTypeId())
-                .orElseThrow(()->new DataNotFoundException("Supplier type cannot find with id"+ supplierInfoDTO.getSupplierTypeId()));
+
 
         if(existingSupplier!=null){
 
-            Users existingUser = userRepository.findById(supplierInfoDTO.getUserId())
-                    .orElseThrow(()-> new DataNotFoundException("Cannot find user with id "+supplierInfoDTO.getUserId()));
-            if (!supplierInfoDTO.getRestaurantName().isEmpty()){
-                existingSupplier.setRestaurantName(supplierInfoDTO.getRestaurantName());
-            }
-            if (!supplierInfoDTO.getDescription().isEmpty()){
-                existingSupplier.setDescription(supplierInfoDTO.getDescription());
-            }
-            if (!supplierInfoDTO.getAddress().isEmpty()){
-                existingSupplier.setAddress(supplierInfoDTO.getAddress());
-            }
-            if (!supplierInfoDTO.getImgUrl().isEmpty()){
-                existingSupplier.setImgUrl(supplierInfoDTO.getImgUrl());
-            }
-            if (existingUser!=null){
+            if(supplierInfoDTO.getUserId()!=null){
+                Users existingUser = userRepository.findById(supplierInfoDTO.getUserId())
+                        .orElseThrow(()-> new DataNotFoundException("Cannot find user with id "+supplierInfoDTO.getUserId()));
                 existingSupplier.setUser(existingUser);
             }
 
-            existingSupplier.setSupplierType(existingSupplierType);
+            if (supplierInfoDTO.getRestaurantName() !=null){
+                existingSupplier.setRestaurantName(supplierInfoDTO.getRestaurantName());
+            }
+            if (supplierInfoDTO.getDescription() != null){
+                existingSupplier.setDescription(supplierInfoDTO.getDescription());
+            }
+            if (supplierInfoDTO.getAddress() !=null){
+                existingSupplier.setAddress(supplierInfoDTO.getAddress());
+            }
+            if (supplierInfoDTO.getImgUrl()!=null){
+                existingSupplier.setImgUrl(supplierInfoDTO.getImgUrl());
+            }
+            if(supplierInfoDTO.getSupplierTypeId()!=null){
+                SupplierType existingSupplierType = supplierTypeRepository.findById(supplierInfoDTO.getSupplierTypeId())
+                        .orElseThrow(()->new DataNotFoundException("Supplier type cannot find with id"+ supplierInfoDTO.getSupplierTypeId()));
+                existingSupplier.setSupplierType(existingSupplierType);
+            }
 
-            existingSupplier.setUser(existingUser);
 
-            return supplierInfoRepository.save(existingSupplier);
+
+             supplierInfoRepository.save(existingSupplier);
         }
-        return null;
     }
 
     @Override
