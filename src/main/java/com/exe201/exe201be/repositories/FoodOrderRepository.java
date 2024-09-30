@@ -2,6 +2,8 @@ package com.exe201.exe201be.repositories;
 
 import com.exe201.exe201be.entities.FoodOrder;
 import com.exe201.exe201be.entities.FoodOrderItem;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -22,5 +24,11 @@ public interface FoodOrderRepository extends JpaRepository<FoodOrder, Long> {
     @Query("SELECT o FROM FoodOrder o WHERE DATE(o.orderTime) BETWEEN :startDate AND :endDate AND o.supplierInfo.id = :supplierInfoId")
     List<FoodOrder> findByOrderTimeBetweenAndSupplierInfo_Id(@Param("startDate") Date startDate, @Param("endDate") Date endDate, @Param("supplierInfoId") Long supplierInfoId);
 
+
+    @Query("SELECT f.supplierInfo AS supplierInfo, COUNT(f) AS totalOrders " +
+            "FROM FoodOrder f " +
+            "GROUP BY f.supplierInfo " +
+            "ORDER BY COUNT(f) DESC")
+    Page<Object[]> findTopSuppliersByOrderCount(Pageable pageable);
 
 }

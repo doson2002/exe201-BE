@@ -3,6 +3,7 @@ package com.exe201.exe201be.services;
 import com.exe201.exe201be.dtos.SupplierInfoDTO;
 import com.exe201.exe201be.entities.*;
 import com.exe201.exe201be.exceptions.DataNotFoundException;
+import com.exe201.exe201be.repositories.FoodOrderRepository;
 import com.exe201.exe201be.repositories.SupplierInfoRepository;
 import com.exe201.exe201be.repositories.SupplierTypeRepository;
 import com.exe201.exe201be.repositories.UserRepository;
@@ -10,10 +11,13 @@ import com.exe201.exe201be.responses.SupplierInfoResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,6 +26,7 @@ public class SupplierInfoService implements ISupplierInfoService {
     private final SupplierInfoRepository supplierInfoRepository;
     private final UserRepository userRepository;
     private final SupplierTypeRepository supplierTypeRepository;
+    private final FoodOrderRepository foodOrderRepository;
 
 
     public SupplierInfo createSupplierInfo(SupplierInfoDTO supplierInfoDTO) throws DataNotFoundException {
@@ -125,4 +130,17 @@ public class SupplierInfoService implements ISupplierInfoService {
         return supplierInfoList;
     }
 
+
+    public Page<Map<String, Object>> getTopSuppliers(Pageable pageable) {
+        Page<Object[]> result = foodOrderRepository.findTopSuppliersByOrderCount(pageable);
+        return result.map(objects -> {
+            SupplierInfo supplierInfo = (SupplierInfo) objects[0]; // Lấy SupplierInfo từ query
+            Long totalOrders = (Long) objects[1]; // Lấy tổng số order
+
+            Map<String, Object> supplierData = new HashMap<>();
+            supplierData.put("supplier", supplierInfo);
+            supplierData.put("totalOrders", totalOrders);
+            return supplierData;
+        });
+    }
 }
