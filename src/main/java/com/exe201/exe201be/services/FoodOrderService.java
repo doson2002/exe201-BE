@@ -10,8 +10,11 @@ import com.exe201.exe201be.responses.FoodOrderDetailResponse;
 import com.exe201.exe201be.responses.FoodOrderItemResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -38,6 +41,7 @@ public class FoodOrderService implements IFoodOrderService{
         foodOrder.setPickupTime(foodOrderDTO.getPickupTime());
         foodOrder.setPickupLocation(foodOrderDTO.getPickupLocation());
         foodOrder.setStatus(foodOrderDTO.getStatus());
+        foodOrder.setPaymentMethod(foodOrderDTO.getPaymentMethod());
         foodOrder.setSupplierInfo(existingSupplier);
         foodOrder.setUser(ExistingCustomer);
         double totalPrice = 0;
@@ -126,7 +130,7 @@ public class FoodOrderService implements IFoodOrderService{
         List<FoodOrderItemResponse> foodOrderItemResponseList = foodOrderItemRepository.findByFoodOrderId(foodOrder.getId())
                 .stream()
                 .map(foodOrderItem -> new FoodOrderItemResponse(foodOrderItem.getId(),
-                        foodOrderItem.getFoodItem().getFoodName(), foodOrderItem.getQuantity()))
+                        foodOrderItem.getFoodItem().getFoodName(), foodOrderItem.getQuantity(), foodOrderItem.getFoodItem().getPrice(), foodOrderItem.getFoodItem().getId()))
                 .collect(Collectors.toList());
 
         return FoodOrderDetailResponse.fromFoodOrders(foodOrder, foodOrderItemResponseList);
@@ -136,6 +140,9 @@ public class FoodOrderService implements IFoodOrderService{
     public List<FoodOrder> getFoodOrdersByUserId(Long userId){
         return foodOrderRepository.findByUser_Id(userId);
     }
+
+
+
     @Transactional
     public void updateOrderStatus(long orderId,String orderStatus) throws DataNotFoundException {
         FoodOrder existingOrder = foodOrderRepository.findById(orderId)

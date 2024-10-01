@@ -18,6 +18,13 @@ public interface FoodItemRepository extends JpaRepository<FoodItem, Long> {
             "(:keyword IS NULL OR :keyword = '' OR f.foodName ILIKE %:keyword%)")
     List<FoodItem> searchFoodItem(@Param("keyword") String keyword);
 
+    @Query("SELECT f FROM FoodItem f WHERE " +
+            "(:keyword IS NULL OR :keyword = '' OR f.foodName ILIKE %:keyword%)")
+    Page<FoodItem> searchFoodItemPageable(@Param("keyword") String keyword, Pageable pageable);
+
+    @Query("SELECT f FROM FoodItem f ORDER BY f.quantitySold DESC")
+    Page<FoodItem> findTopSoldFoodItems(Pageable pageable);
+
     List<FoodItem> findBySupplierInfo_Id(Long supplierId);
 
     @Query("SELECT f.foodName FROM FoodItem f WHERE LOWER(f.foodName) LIKE LOWER(CONCAT('%', :keyword, '%'))")

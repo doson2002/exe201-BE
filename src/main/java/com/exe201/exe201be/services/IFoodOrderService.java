@@ -5,8 +5,11 @@ import com.exe201.exe201be.dtos.OrderRequestDTO;
 import com.exe201.exe201be.entities.FoodOrder;
 import com.exe201.exe201be.exceptions.DataNotFoundException;
 import com.exe201.exe201be.responses.FoodOrderDetailResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Map;
 
 public interface IFoodOrderService {
 
@@ -18,4 +21,6 @@ public interface IFoodOrderService {
     List<FoodOrder> getFoodOrdersByUserId(Long userId);
 
     void updateOrderStatus(long orderId,String orderStatus) throws DataNotFoundException;
+
+
 }
