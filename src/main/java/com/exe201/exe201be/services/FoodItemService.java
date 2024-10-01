@@ -1,6 +1,8 @@
 package com.exe201.exe201be.services;
 
 import com.exe201.exe201be.dtos.FoodItemDTO;
+import com.exe201.exe201be.dtos.FoodItemOrderDTO;
+import com.exe201.exe201be.dtos.SupplierDTO;
 import com.exe201.exe201be.dtos.SupplierInfoDTO;
 import com.exe201.exe201be.entities.*;
 import com.exe201.exe201be.exceptions.DataNotFoundException;
@@ -9,7 +11,9 @@ import com.exe201.exe201be.responses.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -130,15 +134,19 @@ public class FoodItemService implements IFoodItemService{
     }
 
 
-    public List<FoodItemResponse> getAllFoodItem(String keyword) {
-        List<FoodItem> foodItemList = foodItemRepository.searchFoodItem(keyword);
+    public Page<FoodItemResponse> getAllFoodItem(String keyword, Pageable pageable) {
+        // Lấy dữ liệu phân trang từ repository
+        Page<FoodItem> foodItemPage = foodItemRepository.searchFoodItemPageable(keyword, pageable);
+
         // Sử dụng Stream API để map từ FoodItem sang FoodItemResponse
-        List<FoodItemResponse> foodItemResponseList = foodItemList.stream()
+        List<FoodItemResponse> foodItemResponseList = foodItemPage.stream()
                 .map(FoodItemResponse::fromFoodItem) // Map từng FoodItem sang FoodItemResponse
                 .collect(Collectors.toList());
 
-        return foodItemResponseList;
+        // Trả về Page với danh sách FoodItemResponse và các thông tin phân trang
+        return new PageImpl<>(foodItemResponseList, pageable, foodItemPage.getTotalElements());
     }
+
 
     public List<FoodItemOfferedResponse> getAllFoodItemOffered(Long supplierId, int isOffered) {
         List<FoodItem> foodItemList = foodItemRepository.findBySupplierInfo_IdAndIsOffered(supplierId, isOffered);
@@ -165,7 +173,8 @@ public class FoodItemService implements IFoodItemService{
     }
 
 
-    public List<SupplierWithFoodItemsResponse> getAllFoodItemGroupedBySupplier(String keyword) {
+    public Page<SupplierWithFoodItemsResponse> getAllFoodItemGroupedBySupplier(String keyword, Pageable pageable) {
+        // Lấy tất cả FoodItems liên quan đến keyword, không phân trang ở đây
         List<FoodItem> foodItemList = foodItemRepository.searchFoodItem(keyword);
 
         // Sử dụng Stream API để chuyển từ FoodItem sang FoodItemResponse
@@ -177,14 +186,59 @@ public class FoodItemService implements IFoodItemService{
         Map<SupplierInfo, List<FoodItemResponseWithSupplier>> groupedBySupplier = foodItemResponseList.stream()
                 .collect(Collectors.groupingBy(FoodItemResponseWithSupplier::getSupplierInfo));
 
-        // Chuyển đổi từ Map sang List<SupplierWithFoodItems>
+        // Chuyển đổi từ Map sang List<SupplierWithFoodItemsResponse>
         List<SupplierWithFoodItemsResponse> supplierWithFoodItemsList = new ArrayList<>();
         groupedBySupplier.forEach((supplier, foodItems) -> {
             supplierWithFoodItemsList.add(new SupplierWithFoodItemsResponse(supplier, foodItems));
         });
 
-        return supplierWithFoodItemsList;
+        // Tính toán vị trí phân trang trên danh sách Supplier
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), supplierWithFoodItemsList.size());
+
+        // Kiểm tra nếu vị trí start vượt quá danh sách, tránh lỗi phân trang
+        if (start > supplierWithFoodItemsList.size()) {
+            return new PageImpl<>(new ArrayList<>(), pageable, supplierWithFoodItemsList.size());
+        }
+
+        // Tạo một Page mới với SupplierWithFoodItemsResponse được phân trang
+        List<SupplierWithFoodItemsResponse> pagedSupplierList = supplierWithFoodItemsList.subList(start, end);
+        return new PageImpl<>(pagedSupplierList, pageable, supplierWithFoodItemsList.size());
     }
+
+    public Page<FoodItemOrderDTO> getTopSoldFoodItems(Pageable pageable) {
+        Page<FoodItem> foodItems = foodItemRepository.findTopSoldFoodItems(pageable);
+        return foodItems.map(this::convertToDTO);
+    }
+
+    private FoodItemOrderDTO convertToDTO(FoodItem foodItem) {
+        FoodItemOrderDTO dto = new FoodItemOrderDTO();
+        dto.setFoodId(foodItem.getId());
+        dto.setName(foodItem.getFoodName());
+        dto.setQuantitySold(foodItem.getQuantitySold()); // Sử dụng QuantitySold
+
+        // Lấy thông tin supplier và chuyển đổi sang SupplierDTO
+        SupplierInfo supplier = foodItem.getSupplierInfo();
+        if (supplier != null) {
+            SupplierDTO supplierDTO = new SupplierDTO();
+            supplierDTO.setId(supplier.getId());
+            supplierDTO.setAddress(supplier.getAddress());
+            supplierDTO.setDescription(supplier.getDescription());
+            supplierDTO.setRestaurantName(supplier.getRestaurantName());
+            supplierDTO.setImgUrl(supplier.getImgUrl());
+            supplierDTO.setOpenTime(supplier.getOpenTime());
+            supplierDTO.setCloseTime(supplier.getCloseTime());
+            supplierDTO.setTotalReviewCount(supplier.getTotalReviewCount());
+            supplierDTO.setTotalStarRating(supplier.getTotalStarRating());
+            // Thêm các thuộc tính khác nếu cần
+            dto.setSupplierInfo(supplierDTO); // Đặt supplierInfo
+        }
+
+        return dto;
+    }
+
+
+
 
 
 

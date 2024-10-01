@@ -1,6 +1,7 @@
 package com.exe201.exe201be.controllers;
 
 import com.exe201.exe201be.dtos.FoodItemDTO;
+import com.exe201.exe201be.dtos.FoodItemOrderDTO;
 import com.exe201.exe201be.dtos.SupplierInfoDTO;
 import com.exe201.exe201be.dtos.UpdateTimeRequestDTO;
 import com.exe201.exe201be.entities.FoodItem;
@@ -13,6 +14,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -113,23 +115,48 @@ public class FoodItemController {
 
     @GetMapping("/get_all_food_items")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_PARTNER','ROLE_CUSTOMER')")
-    public ResponseEntity<FoodItemResponseList> getAllFoodItems(
-            @RequestParam(defaultValue = "")String keyword){
-        List<FoodItemResponse> foodItemResponseList = foodItemService.getAllFoodItem(keyword);
-        return ResponseEntity.ok(FoodItemResponseList.builder()
-                .foodItems(foodItemResponseList)
-                .build());
+    public ResponseEntity<Page<FoodItemResponse>> getAllFoodItems(
+            @RequestParam(defaultValue = "") String keyword,
+            @RequestParam(defaultValue = "0") int page,         // Số trang, mặc định là 0
+            @RequestParam(defaultValue = "10") int size         // Kích thước trang, mặc định là 10
+    ) {
+        // Tạo Pageable từ các tham số page và size
+        Pageable pageable = PageRequest.of(page, size);
+
+        // Gọi service để lấy dữ liệu phân trang
+        Page<FoodItemResponse> foodItemResponsePage = foodItemService.getAllFoodItem(keyword, pageable);
+
+        // Trả về đối tượng Page chứa các FoodItemResponse
+        return ResponseEntity.ok(foodItemResponsePage);
     }
+
     @GetMapping("/get_food_items_grouped_by_supplierId")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_PARTNER','ROLE_CUSTOMER')")
-    public ResponseEntity<?> getAllFoodItemsGroupedBySupplierId(
-            @RequestParam(defaultValue = "") String keyword) {
+    public ResponseEntity<Page<SupplierWithFoodItemsResponse>> getAllFoodItemsGroupedBySupplierId(
+            @RequestParam(defaultValue = "") String keyword,
+            @RequestParam(defaultValue = "0") int page,           // Số trang, mặc định là 0
+            @RequestParam(defaultValue = "10") int size           // Kích thước trang, mặc định là 10
+    ) {
 
-        // Gọi service để lấy danh sách nhóm theo Supplier
-        List<SupplierWithFoodItemsResponse> supplierWithFoodItemsList = foodItemService.getAllFoodItemGroupedBySupplier(keyword);
+        // Tạo Pageable để xác định trang và kích thước trang
+        Pageable pageable = PageRequest.of(page, size);
 
-        return ResponseEntity.ok(supplierWithFoodItemsList);
+        // Gọi service để lấy danh sách phân trang nhóm theo Supplier
+        Page<SupplierWithFoodItemsResponse> supplierWithFoodItemsPage = foodItemService.getAllFoodItemGroupedBySupplier(keyword, pageable);
+
+        // Trả về ResponseEntity với Page dữ liệu
+        return ResponseEntity.ok(supplierWithFoodItemsPage);
     }
+
+    @GetMapping("/top_sold")
+    public Page<FoodItemOrderDTO> getTopSoldFoodItems(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        return foodItemService.getTopSoldFoodItems(pageable);
+    }
+
 
     @GetMapping("/get_food_items_by_offered_status/{supplierId}")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_PARTNER','ROLE_CUSTOMER')")

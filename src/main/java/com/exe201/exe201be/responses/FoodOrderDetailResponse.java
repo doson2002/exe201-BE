@@ -1,6 +1,7 @@
 package com.exe201.exe201be.responses;
 
 import com.exe201.exe201be.entities.FoodOrder;
+import com.exe201.exe201be.entities.SupplierInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
@@ -30,6 +31,9 @@ public class FoodOrderDetailResponse {
     @JsonProperty(value = "payment_status")
     private int paymentStatus;
 
+    @JsonProperty(value = "supplier_info")
+    private SupplierInfo supplierInfo;
+
     private List<FoodOrderItemResponse> foodOrderItemResponseList;
 
 
@@ -42,6 +46,7 @@ public class FoodOrderDetailResponse {
                 .status(foodOrder.getStatus())
                 .paymentMethod(foodOrder.getPaymentMethod())
                 .paymentStatus(foodOrder.getPaymentStatus())
+                .supplierInfo(foodOrder.getSupplierInfo())
                 .foodOrderItemResponseList(foodOrderItemResponseList)
 
                 .build();

@@ -13,6 +13,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -137,6 +138,15 @@ public class SupplierInfoController {
     public ResponseEntity<?> getSupplierByUserId(@Valid @PathVariable Long userId) throws DataNotFoundException {
         SupplierInfo supplier = supplierInfoService.getSupplierByUserId(userId);
         return ResponseEntity.ok(SupplierInfoResponse.fromSupplierInfo(supplier));
+    }
+
+    @GetMapping("/top")
+    public ResponseEntity<Page<Map<String, Object>>> getTopSuppliers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Map<String, Object>> result = supplierInfoService.getTopSuppliers(pageable);
+        return ResponseEntity.ok(result);
     }
 
 
