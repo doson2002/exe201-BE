@@ -28,6 +28,11 @@ public class FoodItemOfferedResponse {
     @JsonProperty(value = "image_url")
     private String imageUrl;
 
+    private int quantity;
+
+    @JsonProperty(value = "supplier_id")
+    private Long supplierId;
+
     public static FoodItemOfferedResponse fromFoodItem(FoodItem foodItem) {
 
         FoodItemOfferedResponse foodItemOfferedResponse = FoodItemOfferedResponse.builder()
@@ -36,6 +41,8 @@ public class FoodItemOfferedResponse {
                 .price(foodItem.getPrice())
                 .description(foodItem.getDescription())
                 .imageUrl(foodItem.getImgUrl())
+                .quantity(1)
+                .supplierId(foodItem.getSupplierInfo().getId())
                 .build();
         return foodItemOfferedResponse;
     }

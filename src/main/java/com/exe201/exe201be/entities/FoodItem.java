@@ -24,10 +24,10 @@ public class FoodItem extends BaseEntity{
     private SupplierInfo supplierInfo;
 
     @Column(name = "description")
-    private String description;
+    private String description = "";
 
     @Column(name = "food_name")
-    private String foodName;
+    private String foodName = "";
 
     @Column(name = "inventory_quantity")
     private int inventoryQuantity;
@@ -42,7 +42,7 @@ public class FoodItem extends BaseEntity{
     private String status;
 
     @Column(name = "img_url")
-    private String imgUrl;
+    private String imgUrl = "";
 
     @Column(name = "ready_time")
     private Date readyTime = new Date();
