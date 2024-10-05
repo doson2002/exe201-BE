@@ -7,6 +7,7 @@ import com.exe201.exe201be.entities.SupplierInfo;
 import com.exe201.exe201be.exceptions.DataNotFoundException;
 import com.exe201.exe201be.responses.OrderRatingResponse;
 import com.exe201.exe201be.responses.SupplierInfoResponse;
+import com.exe201.exe201be.responses.SupplierRatingResponse;
 import com.exe201.exe201be.services.IOrderRatingService;
 import com.exe201.exe201be.services.OrderRatingService;
 import lombok.NoArgsConstructor;
@@ -16,6 +17,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -39,5 +41,22 @@ public class OrderRatingController {
                 .map(OrderRatingResponse::fromSupplierInfo)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(orderRatingResponseList);
+    }
+    @GetMapping("/get_rating_detail/{supplierId}")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_PARTNER','ROLE_CUSTOMER')")
+    public ResponseEntity<SupplierRatingResponse> getSupplierRatings(@PathVariable Long supplierId) throws DataNotFoundException {
+        // Gọi service để lấy thông tin về đánh giá
+        SupplierRatingResponse response = orderRatingService.getSupplierRatings(supplierId);
+        return ResponseEntity.ok(response);
+    }
+    @GetMapping("/get_all_messages_by_stars/{supplierId}")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_PARTNER','ROLE_CUSTOMER')")
+    public ResponseEntity<Map<Integer, List<String>>> getAllMessagesByStars(
+            @PathVariable Long supplierId) throws DataNotFoundException {
+        // Gọi service để lấy danh sách các response_message phân loại theo số sao
+        Map<Integer, List<String>> responseMessagesByStars = orderRatingService.getAllResponseMessagesByStars(supplierId);
+
+        // Trả về response
+        return ResponseEntity.ok(responseMessagesByStars);
     }
 }
