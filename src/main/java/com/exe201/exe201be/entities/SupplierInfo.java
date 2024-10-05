@@ -23,16 +23,16 @@ public class SupplierInfo {
     private Users user;
 
     @Column(name = "restaurant_name", length = 200)
-    private String restaurantName;
+    private String restaurantName = "";
 
     @Column(name = "description", columnDefinition = "TEXT")
-    private  String description;
+    private  String description = "";
 
     @Column(name = "address")
-    private String address;
+    private String address = "";
 
     @Column(name = "img_url")
-    private String imgUrl;
+    private String imgUrl = "";
 
     @Column(name = "total_star_rating")
     private double totalStarRating;
@@ -46,12 +46,9 @@ public class SupplierInfo {
 
     // Thêm thời gian mở cửa và đóng cửa
     @Column(name = "open_time")
-    private LocalTime openTime;
+    private LocalTime openTime = LocalTime.of(0, 0, 0); // Ví dụ: Mở cửa lúc 08:00:00
 
     @Column(name = "close_time")
-    private LocalTime closeTime;
-
-
-
+    private LocalTime closeTime = LocalTime.of(0, 0, 0); // Đóng cửa lúc 00:00:00
 
 }
