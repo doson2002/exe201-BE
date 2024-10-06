@@ -26,6 +26,9 @@ public class FoodItemResponseWithSupplier {
     @JsonProperty(value = "image_url")
     private String imageUrl;
 
+    @JsonProperty(value = "quantity_add")
+    private int quantityAdd;
+
     @JsonProperty(value = "supplierInfo")
     private SupplierInfo supplierInfo;
 
@@ -37,6 +40,7 @@ public class FoodItemResponseWithSupplier {
                 .foodName(foodItem.getFoodName())
                 .price(foodItem.getPrice())
                 .imageUrl(foodItem.getImgUrl())
+                .quantityAdd(1)
                 .supplierInfo(foodItem.getSupplierInfo())
                 .build();
         return foodItemResponseWithSupplier;
