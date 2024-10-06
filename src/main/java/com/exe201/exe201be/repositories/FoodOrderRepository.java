@@ -20,10 +20,16 @@ public interface FoodOrderRepository extends JpaRepository<FoodOrder, Long> {
     @Query("SELECT o FROM FoodOrder o WHERE DATE(o.orderTime) = :orderDate AND o.supplierInfo.id = :supplierInfoId")
     List<FoodOrder> findByOrderTimeAndSupplierInfo_Id(@Param("orderDate") Date orderDate, @Param("supplierInfoId") Long supplierInfoId);
 
+    @Query("SELECT o FROM FoodOrder o WHERE DATE(o.orderTime) = :orderDate")
+    List<FoodOrder> findByOrderTime(@Param("orderDate") Date orderDate);
+
     // Query cho khoảng thời gian nhưng chỉ so sánh theo ngày
     @Query("SELECT o FROM FoodOrder o WHERE DATE(o.orderTime) BETWEEN :startDate AND :endDate AND o.supplierInfo.id = :supplierInfoId")
     List<FoodOrder> findByOrderTimeBetweenAndSupplierInfo_Id(@Param("startDate") Date startDate, @Param("endDate") Date endDate, @Param("supplierInfoId") Long supplierInfoId);
 
+
+    @Query("SELECT o FROM FoodOrder o WHERE DATE(o.orderTime) BETWEEN :startDate AND :endDate")
+    List<FoodOrder> findByOrderTimeBetween(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
 
     @Query("SELECT f.supplierInfo AS supplierInfo, COUNT(f) AS totalOrders " +
             "FROM FoodOrder f " +
