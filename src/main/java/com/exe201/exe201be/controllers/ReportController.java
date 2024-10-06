@@ -5,6 +5,9 @@ import com.exe201.exe201be.entities.FoodItem;
 import com.exe201.exe201be.responses.FoodItemReportResponse;
 import com.exe201.exe201be.services.IReportService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -89,5 +92,152 @@ public class ReportController {
             throw new RuntimeException("An error occurred while processing the request.");
         }
     }
+    @GetMapping("/get_user_count_by_date")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_PARTNER')")
+    public ResponseEntity<?> getUserCountByDate(@RequestParam String date) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            sdf.setLenient(false); // Thiết lập để không cho phép định dạng không chính xác
+            Date dateSelected;
+            if (date != null ) {
+                dateSelected = sdf.parse(date);
+            } else {
+                throw new RuntimeException("At least one date parameter is required.");
+            }
+            // Gọi service để lấy dữ liệu user và phần trăm thay đổi
+            Map<String, Object> result = reportService.getUserCountAndPercentageChangeByDate(dateSelected);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            // Xử lý các lỗi khác
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "An error occurred while processing your request.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
+
+    @GetMapping("/get_product_sold_by_date")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_PARTNER')")
+    public ResponseEntity<?> getProductSoldByDate(@RequestParam String date) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            sdf.setLenient(false); // Thiết lập để không cho phép định dạng không chính xác
+            Date dateSelected;
+            if (date != null ) {
+                dateSelected = sdf.parse(date);
+            } else {
+                throw new RuntimeException("At least one date parameter is required.");
+            }
+            // Lấy tổng số lượng sản phẩm bán được và phần trăm thay đổi so với ngày hôm qua
+            Map<String, Object> result = reportService.getTotalProductSoldAndPercentageChangeByDate(dateSelected);
+
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            // Xử lý khi có lỗi xảy ra
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Có lỗi xảy ra trong quá trình tính toán");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
+
+    @GetMapping("/get_order_count_by_date")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_PARTNER')")
+    public ResponseEntity<?> getOrderCountByDate(@RequestParam String date) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            sdf.setLenient(false); // Thiết lập để không cho phép định dạng không chính xác
+            Date dateSelected;
+            if (date != null ) {
+                dateSelected = sdf.parse(date);
+            } else {
+                throw new RuntimeException("At least one date parameter is required.");
+            }
+            // Lấy tổng số lượng đơn hàng và phần trăm thay đổi so với ngày hôm qua
+            Map<String, Object> result = reportService.getTotalOrderCountAndPercentageChangeByDate(dateSelected);
+
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            // Xử lý khi có lỗi xảy ra
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Có lỗi xảy ra trong quá trình tính toán");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
+
+    @GetMapping("/get_revenue_by_date")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_PARTNER')")
+    public ResponseEntity<?> getRevenueByDate(@RequestParam String date) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            sdf.setLenient(false); // Thiết lập để không cho phép định dạng không chính xác
+            Date dateSelected;
+            if (date != null ) {
+                dateSelected = sdf.parse(date);
+            } else {
+                throw new RuntimeException("At least one date parameter is required.");
+            }
+            // Lấy tổng doanh thu và phần trăm thay đổi so với ngày hôm qua
+            Map<String, Object> result = reportService.getTotalRevenueAndPercentageChangeByDate(dateSelected);
+
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            // Xử lý khi có lỗi xảy ra
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Có lỗi xảy ra trong quá trình tính toán");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
+
+    @GetMapping("/get_revenue_by_date_range_for_admin")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_PARTNER')")
+    public ResponseEntity<?> getRevenueByDateRange(
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            sdf.setLenient(false); // Thiết lập để không cho phép định dạng không chính xác
+            Date start;
+            Date end;
+
+            // Kiểm tra và phân tích ngày bắt đầu và ngày kết thúc
+            if (startDate != null) {
+                start = sdf.parse(startDate);
+            } else {
+                throw new IllegalArgumentException("Start date is required.");
+            }
+
+            if (endDate != null) {
+                end = sdf.parse(endDate);
+            } else {
+                throw new IllegalArgumentException("End date is required.");
+            }
+
+            // Kiểm tra xem ngày bắt đầu có trước ngày kết thúc không
+            if (start.after(end)) {
+                throw new IllegalArgumentException("Start date must be before or equal to end date.");
+            }
+
+            // Gọi hàm để lấy tổng doanh thu
+            Map<String, Map<String, Double>> revenueMap = reportService.getTotalRevenueForAdminByDateRange(start, end);
+
+            return ResponseEntity.ok(revenueMap);
+        } catch (ParseException e) {
+            // Xử lý lỗi định dạng ngày
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Invalid date format. Please use yyyy-MM-dd.");
+            return ResponseEntity.badRequest().body(errorResponse);
+        } catch (IllegalArgumentException e) {
+            // Xử lý các lỗi liên quan đến tham số đầu vào
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", e.getMessage());
+            return ResponseEntity.badRequest().body(errorResponse);
+        } catch (Exception e) {
+            // Xử lý khi có lỗi khác xảy ra
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "An error occurred while calculating revenue.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
+
+
 
 }
