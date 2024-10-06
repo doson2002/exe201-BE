@@ -24,7 +24,7 @@ public class FAQController {
     @PostMapping("/create")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_PARTNER')")
     public ResponseEntity<ResponseDTO> createFAQ(
-            @RequestParam("files") MultipartFile[] files,
+            @RequestParam(value = "files", required = false) MultipartFile[] files,
             @RequestParam("title") String title,
             @RequestParam("article") String article) {
         try {
