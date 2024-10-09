@@ -14,10 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,7 +34,7 @@ public class FoodOrderService implements IFoodOrderService{
         SupplierInfo existingSupplier = supplierInfoRepository.findById(foodOrderDTO.getSupplierId())
                 .orElseThrow(() -> new DataNotFoundException("Supplier not found"));
         FoodOrder foodOrder = new FoodOrder();
-        foodOrder.setOrderTime(foodOrderDTO.getOrderTime());
+        foodOrder.setOrderTime(new Date());
         foodOrder.setPickupTime(foodOrderDTO.getPickupTime());
         foodOrder.setPickupLocation(foodOrderDTO.getPickupLocation());
         foodOrder.setStatus(foodOrderDTO.getStatus());
@@ -149,6 +146,13 @@ public class FoodOrderService implements IFoodOrderService{
                 .orElseThrow(()-> new DataNotFoundException("Food order not found"));
         existingOrder.setStatus(orderStatus);
     }
+
+    @Transactional
+    public void updatePaymentStatus(long orderId,int paymentStatus) throws DataNotFoundException {
+        FoodOrder existingOrder = foodOrderRepository.findById(orderId)
+                .orElseThrow(()-> new DataNotFoundException("Food order not found"));
+        existingOrder.setPaymentStatus(paymentStatus);
+    }
     private void updateFoodOrder(Long foodOrderId, OrderUpdateRequestDTO updateRequestDTO) throws DataNotFoundException {
         FoodOrder existingOrder = foodOrderRepository.findById(foodOrderId)
                 .orElseThrow(()->new DataNotFoundException("Food order cannot find with id: "+ foodOrderId));
@@ -177,5 +181,15 @@ public class FoodOrderService implements IFoodOrderService{
     }
 
 
+    @Transactional
+    public void deleteOrder(long orderId) throws DataNotFoundException {
+        FoodOrder existingOrder = foodOrderRepository.findById(orderId)
+                .orElseThrow(()-> new DataNotFoundException("Food order not found"));
+        // Xóa các FoodOrderItem liên quan
+        foodOrderItemRepository.deleteByFoodOrder(existingOrder);
+
+        // Xóa FoodOrder
+        foodOrderRepository.deleteById(orderId);
+    }
 
 }

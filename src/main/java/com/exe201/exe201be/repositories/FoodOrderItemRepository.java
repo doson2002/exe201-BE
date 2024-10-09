@@ -1,6 +1,7 @@
 package com.exe201.exe201be.repositories;
 
 import com.exe201.exe201be.entities.FoodItem;
+import com.exe201.exe201be.entities.FoodOrder;
 import com.exe201.exe201be.entities.FoodOrderItem;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,4 +21,6 @@ public interface FoodOrderItemRepository extends JpaRepository<FoodOrderItem, Lo
             "GROUP BY foi.foodItem " +
             "ORDER BY totalQuantity DESC")
     Page<Object[]> findTopOrderedFoodItems(Pageable pageable);
+
+    void deleteByFoodOrder(FoodOrder foodOrder);
 }
