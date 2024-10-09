@@ -101,7 +101,10 @@ public class FoodItemService implements IFoodItemService{
         existingFoodItem.setFoodName(foodItemDTO.getFoodName());
         existingFoodItem.setPrice(foodItemDTO.getPrice());
         existingFoodItem.setQuantitySold(foodItemDTO.getQuantitySold());
-        existingFoodItem.setImgUrl(foodItemDTO.getImageUrl());
+        if(foodItemDTO.getImageUrl()!=null && !foodItemDTO.getImageUrl().equals("")) {
+            existingFoodItem.setImgUrl(foodItemDTO.getImageUrl());
+
+        }
         existingFoodItem.setInventoryQuantity(foodItemDTO.getInventoryQuantity());
         existingFoodItem.setDescription(foodItemDTO.getDescription());
         existingFoodItem.setStatus(foodItemDTO.getStatus());

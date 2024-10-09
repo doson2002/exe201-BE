@@ -6,6 +6,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface IImageBannerService {
-    List<ImageBanner> getAllImageBanner();
+    List<ImageBanner> getAllImageBanner(int bannerType);
     String createBanner(MultipartFile file) throws Exception;
 }

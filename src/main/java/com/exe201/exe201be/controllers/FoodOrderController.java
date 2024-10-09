@@ -22,6 +22,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -108,6 +109,18 @@ public class FoodOrderController {
         }
     }
 
+    @PutMapping("/update_payment_status/{orderId}")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_PARTNER','ROLE_CUSTOMER')")
+    public ResponseEntity<?> updatePaymentStatus(@Valid @PathVariable Long orderId,
+                                                   @RequestBody int paymentStatus){
+        try {
+            foodOrderService.updatePaymentStatus(orderId, paymentStatus);
+            return ResponseEntity.ok("payment status updated successfully.");
+        } catch (DataNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
 
     private ResponseEntity<FoodOrderResponseList> getFoodOrderResponseListResponseEntity(List<FoodOrder> orders) {
         List<FoodOrderResponse> orderResponses = orders.stream()
@@ -120,6 +133,32 @@ public class FoodOrderController {
         return ResponseEntity.ok(FoodOrderResponseList.builder()
                 .orders(orderResponses)
                 .build());
+    }
+
+    // API để xóa order theo orderId
+    @DeleteMapping("/delete/{orderId}")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_PARTNER','ROLE_CUSTOMER')")
+    public ResponseEntity<Map<String, String>> deleteOrder(@PathVariable long orderId) {
+        try {
+            foodOrderService.deleteOrder(orderId);
+            // Trả về JSON với status
+            Map<String, String> response = new HashMap<>();
+            response.put("status", "success");
+            response.put("message", "order deleted successfully");
+            return ResponseEntity.ok(response);
+        } catch (DataNotFoundException e) {
+            // Trả về lỗi nếu order không tồn tại
+            Map<String, String> response = new HashMap<>();
+            response.put("status", "failed");
+            response.put("errorMessage", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        } catch (Exception e) {
+            // Trả về lỗi chung nếu có lỗi khác
+            Map<String, String> response = new HashMap<>();
+            response.put("status", "failed");
+            response.put("errorMessage", "An error occurred while deleting the order");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
     }
 
 }
