@@ -41,6 +41,9 @@ public class FoodOrder {
     @Column(name = "total_items")
     private int totalItems;
 
+    @Column(name = "shipping_fee")
+    private double shippingFee;
+
     @Column(name = "status")
     private String status;  //('pending', 'confirmed', 'completed')
 

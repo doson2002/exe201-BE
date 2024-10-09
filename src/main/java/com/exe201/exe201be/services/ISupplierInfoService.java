@@ -25,5 +25,6 @@ public interface ISupplierInfoService {
     List<SupplierInfo> getSupplierInfoBySupplierTypeId(Long supplierTypeId);
     void updateTimeOfRestaurant(Long id, LocalTime openTime, LocalTime closeTime) throws DataNotFoundException;
 
+    void updateLocation(Long supplierId, double latitude, double longitude) throws DataNotFoundException;
     Page<Map<String, Object>> getTopSuppliers(Pageable pageable);
 }

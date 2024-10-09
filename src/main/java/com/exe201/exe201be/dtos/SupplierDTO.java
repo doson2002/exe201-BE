@@ -1,6 +1,7 @@
 package com.exe201.exe201be.dtos;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.Column;
 import lombok.*;
 
 import java.time.LocalTime;
@@ -39,4 +40,6 @@ public class SupplierDTO {
 
     @JsonProperty(value = "close_time")
     private LocalTime closeTime;
+
+
 }

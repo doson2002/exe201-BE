@@ -113,6 +113,29 @@ public class SupplierInfoController {
         }
     }
 
+    // Phương thức cập nhật tọa độ cho nhà cung cấp
+    @PutMapping("/update_location/{supplierId}")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_PARTNER')")
+    public ResponseEntity<Map<String, String>> updateSupplierLocation(
+            @PathVariable Long supplierId,
+            @RequestParam double latitude,
+            @RequestParam double longitude) {
+        try {
+            supplierInfoService.updateLocation(supplierId, latitude, longitude);
+
+            // Trả về JSON với status thành công
+            Map<String, String> response = new HashMap<>();
+            response.put("status", "success");
+            response.put("message", "Supplier location updated successfully");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            // Trả về lỗi nếu có
+            Map<String, String> response = new HashMap<>();
+            response.put("status", "failed");
+            response.put("errorMessage", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
 
     @GetMapping("/get_all_suppliers")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_PARTNER','ROLE_CUSTOMER')")
