@@ -40,7 +40,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                                     String.format("%s/users/login", apiPrefix),
                                     String.format("%s/users/register", apiPrefix),
                                     String.format("%s/users/update_password/**", apiPrefix),
-                                    String.format("%s/forgot_password/verify_mail/**", apiPrefix),
+                                    String.format("%s/forgot_password/send_otp/**", apiPrefix),
                                     String.format("%s/forgot_password/verify_otp/**", apiPrefix),
                                     String.format("%s/forgot_password/change_password/**", apiPrefix),
                                     String.format("%s/payment/vn-pay-callback/**", apiPrefix),
