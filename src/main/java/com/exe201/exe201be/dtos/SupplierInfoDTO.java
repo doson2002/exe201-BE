@@ -44,4 +44,11 @@ public class SupplierInfoDTO {
     private LocalTime closeTime;
     @JsonProperty(value = "user_id")
     private Long userId;
+
+    // Thêm biến để lưu tọa độ
+    @JsonProperty(value = "latitude")
+    private double latitude;
+
+    @JsonProperty(value = "longitude")
+    private double longitude;
 }

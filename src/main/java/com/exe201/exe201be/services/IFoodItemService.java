@@ -6,6 +6,7 @@ import com.exe201.exe201be.entities.FoodItem;
 import com.exe201.exe201be.exceptions.DataNotFoundException;
 import com.exe201.exe201be.responses.FoodItemOfferedResponse;
 import com.exe201.exe201be.responses.FoodItemResponse;
+import com.exe201.exe201be.responses.FoodItemSoldTopResponse;
 import com.exe201.exe201be.responses.SupplierWithFoodItemsResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -33,4 +34,6 @@ public interface IFoodItemService {
     List<FoodItemOfferedResponse> getAllFoodItemOffered(Long supplierId, int isOffered);
 
     Page<FoodItemOrderDTO> getTopSoldFoodItems(Pageable pageable);
+
+    Page<FoodItemSoldTopResponse> getTopFoodItems(int n, int page, int size);
 }

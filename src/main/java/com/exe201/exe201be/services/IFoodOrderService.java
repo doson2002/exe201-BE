@@ -21,6 +21,8 @@ public interface IFoodOrderService {
     List<FoodOrder> getFoodOrdersByUserId(Long userId);
 
     void updateOrderStatus(long orderId,String orderStatus) throws DataNotFoundException;
+    void updatePaymentStatus(long orderId,int paymentStatus) throws DataNotFoundException;
 
+    void deleteOrder(long orderId) throws DataNotFoundException;
 
 }

@@ -25,8 +25,8 @@ public class ImageBannerService implements IImageBannerService{
     private final ImageBannerRepository imageBannerRepository;
     private final String bucketName = "exe201-c1658.appspot.com"; // Đặt tên bucket của
 
-    public List<ImageBanner> getAllImageBanner() {
-        return imageBannerRepository.findAll().stream()
+    public List<ImageBanner> getAllImageBanner(int bannerType) {
+        return imageBannerRepository.findByBannerType(bannerType).stream()
                 .filter(ImageBanner::getIsActived) // Lọc các banner có isActived = true
                 .collect(Collectors.toList());
     }

@@ -20,8 +20,8 @@ public class ImageBannerController {
     private final IImageBannerService imageBannerService;
     @GetMapping("/get_all_image_banners")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_PARTNER','ROLE_CUSTOMER')")
-    public ResponseEntity<?> getAllSupplier() {
-        List<ImageBanner> imageBanners = imageBannerService.getAllImageBanner();
+    public ResponseEntity<?> getAllSupplier(@RequestParam(defaultValue = "1") int bannerType) {
+        List<ImageBanner> imageBanners = imageBannerService.getAllImageBanner(bannerType);
         return ResponseEntity.ok(imageBanners);
     }
 

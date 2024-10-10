@@ -10,10 +10,7 @@ import com.exe201.exe201be.repositories.*;
 import com.exe201.exe201be.responses.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -101,7 +98,10 @@ public class FoodItemService implements IFoodItemService{
         existingFoodItem.setFoodName(foodItemDTO.getFoodName());
         existingFoodItem.setPrice(foodItemDTO.getPrice());
         existingFoodItem.setQuantitySold(foodItemDTO.getQuantitySold());
-        existingFoodItem.setImgUrl(foodItemDTO.getImageUrl());
+        if(foodItemDTO.getImageUrl()!=null && !foodItemDTO.getImageUrl().equals("")) {
+            existingFoodItem.setImgUrl(foodItemDTO.getImageUrl());
+
+        }
         existingFoodItem.setInventoryQuantity(foodItemDTO.getInventoryQuantity());
         existingFoodItem.setDescription(foodItemDTO.getDescription());
         existingFoodItem.setStatus(foodItemDTO.getStatus());
@@ -209,6 +209,24 @@ public class FoodItemService implements IFoodItemService{
     public Page<FoodItemOrderDTO> getTopSoldFoodItems(Pageable pageable) {
         Page<FoodItem> foodItems = foodItemRepository.findTopSoldFoodItems(pageable);
         return foodItems.map(this::convertToDTO);
+    }
+
+    public Page<FoodItemSoldTopResponse> getTopFoodItems(int n, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "quantitySold"));
+        Page<FoodItem> foodItemsPage = foodItemRepository.findTopSoldFoodItems(pageable);
+
+        return foodItemsPage.map(this::convertToResponse);
+    }
+
+    // Chuyển đổi từ FoodItem sang FoodItemResponse và tính percentageSold
+    private FoodItemSoldTopResponse convertToResponse(FoodItem foodItem) {
+        FoodItemSoldTopResponse response = new FoodItemSoldTopResponse();
+        response.setId(foodItem.getId());
+        response.setFoodName(foodItem.getFoodName());
+        response.setQuantitySold(foodItem.getQuantitySold());
+        response.setInventoryQuantity(foodItem.getInventoryQuantity());
+        response.setPercentageSold((foodItem.getQuantitySold() / (double) foodItem.getInventoryQuantity()) * 100);
+        return response;
     }
 
     private FoodItemOrderDTO convertToDTO(FoodItem foodItem) {

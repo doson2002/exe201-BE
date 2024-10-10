@@ -31,9 +31,14 @@ public class FoodOrderDTO {
     @JsonProperty(value = "payment_status")
     private int paymentStatus;
 
+    @JsonProperty(value = "shipping_fee")
+    private double shippingFee;
+
     @JsonProperty(value = "user_id")
     private Long userId;
 
     @JsonProperty(value = "supplier_id")
     private Long supplierId;
+
+
 }

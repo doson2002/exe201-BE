@@ -47,6 +47,13 @@ public class SupplierInfoResponse {
     @JsonProperty(value = "open_time")
     private LocalTime openTime;
 
+    // Thêm biến để lưu tọa độ
+    @JsonProperty(value = "latitude")
+    private double latitude;
+
+    @JsonProperty(value = "longitude")
+    private double longitude;
+
 
 
     public static SupplierInfoResponse fromSupplierInfo(SupplierInfo supplierInfo) {
@@ -61,6 +68,8 @@ public class SupplierInfoResponse {
                 .imgUrl(supplierInfo.getImgUrl())
                 .closeTime(supplierInfo.getCloseTime())
                 .openTime(supplierInfo.getOpenTime())
+                .latitude(supplierInfo.getLatitude())
+                .longitude(supplierInfo.getLongitude())
                 .user(supplierInfo.getUser())
                 .build();
         return supplierInfoResponse;

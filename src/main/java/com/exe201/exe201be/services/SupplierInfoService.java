@@ -93,7 +93,13 @@ public class SupplierInfoService implements ISupplierInfoService {
                 existingSupplier.setSupplierType(existingSupplierType);
             }
 
+            if (supplierInfoDTO.getLatitude() !=0){
+                existingSupplier.setLatitude(supplierInfoDTO.getLatitude());
+            }
 
+            if (supplierInfoDTO.getLongitude() !=0){
+                existingSupplier.setLongitude(supplierInfoDTO.getLongitude());
+            }
 
              supplierInfoRepository.save(existingSupplier);
         }
@@ -108,6 +114,17 @@ public class SupplierInfoService implements ISupplierInfoService {
             existingSupplier.setCloseTime(closeTime);
             supplierInfoRepository.save(existingSupplier);
         }
+    }
+
+    // Phương thức cập nhật tọa độ
+    @Override
+    public void updateLocation(Long supplierId, double latitude, double longitude) throws DataNotFoundException {
+        SupplierInfo supplier = supplierInfoRepository.findById(supplierId)
+                .orElseThrow(() -> new DataNotFoundException("Supplier not found"));
+
+        supplier.setLatitude(latitude);
+        supplier.setLongitude(longitude);
+        supplierInfoRepository.save(supplier);
     }
 
     public SupplierInfo getSupplierInfo(Long id) throws DataNotFoundException {

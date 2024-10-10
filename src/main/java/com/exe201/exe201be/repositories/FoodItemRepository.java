@@ -34,4 +34,6 @@ public interface FoodItemRepository extends JpaRepository<FoodItem, Long> {
     List<FoodItem> findTopSellingProducts(@Param("limit") int limit);
 
     List<FoodItem> findBySupplierInfo_IdAndIsOffered(Long supplierId, int isOffered);
+
+
 }

@@ -21,5 +21,8 @@ public class ImageBanner {
     @Column(name = "is_actived")
     private Boolean isActived = true;
 
+    @Column(name = "banner_type")
+    private int bannerType;
+
     private int i;
 }

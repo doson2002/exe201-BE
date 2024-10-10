@@ -10,9 +10,12 @@ import com.exe201.exe201be.services.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 
@@ -25,31 +28,85 @@ public class ForgotPasswordController {
     private final PasswordEncoder passwordEncoder;
     private final IUserService userService;
 
-    @PostMapping("/verify_mail/{email}")
-    public ResponseEntity<String> verifyEmail(@PathVariable String email) {
-        forgotPasswordService.verifyEmailAndSendOTP(email);// Check valid email and send otp
-        return ResponseEntity.ok("Email sent for verification !!!");
-
+    @PostMapping("/send_otp/{email}")
+    public ResponseEntity<?> sendOtp(@PathVariable String email) {
+        Map<String, String> response = new HashMap<>();
+        try {
+            forgotPasswordService.verifyEmailAndSendOTP(email);
+            response.put("status", "success");
+            response.put("message", "Email sent for verification !!!");
+            return ResponseEntity.ok(response);
+        } catch (UsernameNotFoundException ex) {
+            response.put("status", "failed");
+            response.put("errorMessage", ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        } catch (Exception ex) {
+            response.put("status", "failed");
+            response.put("errorMessage", "An unexpected error occurred.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
     }
     @PostMapping("/verify_otp/{email}")
-    public ResponseEntity<String> verifyOtp(@PathVariable String email,
-                                            @RequestBody OtpDTO otpDTO) {
-        forgotPasswordService.verifyOTP(email, otpDTO.otp());
-        return ResponseEntity.ok("OTP verified!");
+    public ResponseEntity<?> verifyOtp(@PathVariable String email, @RequestParam("otp") Integer otp) {
+        Map<String, String> response = new HashMap<>();
+        try {
+            forgotPasswordService.verifyOTP(email, otp);
+            response.put("status", "success");
+            response.put("message", "OTP verified successfully!");
+            return ResponseEntity.ok(response);
+        } catch (UsernameNotFoundException ex) {
+            response.put("status", "failed");
+            response.put("errorMessage", ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        } catch (RuntimeException ex) {
+            response.put("status", "failed");
+            response.put("errorMessage", ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        } catch (Exception ex) {
+            response.put("status", "failed");
+            response.put("errorMessage", "An unexpected error occurred.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
     }
     @PostMapping("/change_password/{email}")
-    public ResponseEntity<String> changePasswordHandler(@RequestBody ChangePasswordDTO changePasswordDTO,
-                                                        @PathVariable String email) throws DataNotFoundException {
-        if (!Objects.equals(changePasswordDTO.password(), changePasswordDTO.retypePassword())) {
-            return new ResponseEntity<>("Please enter password again!", HttpStatus.EXPECTATION_FAILED);
+    public ResponseEntity<Map<String, String>> changePasswordHandler(
+            @RequestBody ChangePasswordDTO changePasswordDTO,
+            @PathVariable String email) {
+
+        Map<String, String> response = new HashMap<>();
+
+        try {
+            // Kiểm tra nếu password và retypePassword không giống nhau
+            if (!Objects.equals(changePasswordDTO.password(), changePasswordDTO.retypePassword())) {
+                response.put("status", "failed");
+                response.put("errorMessage", "Passwords do not match. Please enter password again!");
+                return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(response);
+            }
+
+            // Mã hóa password
+            String encodedPassword = passwordEncoder.encode(changePasswordDTO.password());
+
+            // Cập nhật password của user
+            userService.updatePassword(email, encodedPassword);
+
+            // Phản hồi thành công
+            response.put("status", "success");
+            response.put("message", "Password has been changed!");
+            return ResponseEntity.ok(response);
+
+        } catch (DataNotFoundException ex) {
+            // Trường hợp không tìm thấy người dùng
+            response.put("status", "failed");
+            response.put("errorMessage", ex.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        } catch (Exception ex) {
+            // Trường hợp lỗi không mong đợi
+            response.put("status", "failed");
+            response.put("errorMessage", "An unexpected error occurred.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
-
-        String encodedPassword = passwordEncoder.encode(changePasswordDTO.password());
-        userService.updatePassword(email, encodedPassword);
-
-        //forgotPasswordService.deleteForgotPassword(fp.getId());
-        return ResponseEntity.ok("Password has been changed!");
     }
+
 }
 
 

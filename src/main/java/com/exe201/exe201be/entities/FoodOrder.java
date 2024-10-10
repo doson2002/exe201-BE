@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Getter
@@ -40,6 +41,9 @@ public class FoodOrder {
     @Column(name = "total_items")
     private int totalItems;
 
+    @Column(name = "shipping_fee")
+    private double shippingFee;
+
     @Column(name = "status")
     private String status;  //('pending', 'confirmed', 'completed')
 
@@ -49,5 +53,7 @@ public class FoodOrder {
     @Column(name = "payment_status")
     private int paymentStatus;
 
+    @OneToMany(mappedBy = "foodOrder", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FoodOrderItem> foodOrderItems;
 
 }
