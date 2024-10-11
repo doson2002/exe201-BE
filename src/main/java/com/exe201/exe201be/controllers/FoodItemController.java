@@ -202,6 +202,16 @@ public class FoodItemController {
         return ResponseEntity.ok(foodItemNames);
     }
 
+    @GetMapping("/top_sold_for_admin")
+    public ResponseEntity<?> getTopFoodItems(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam int n) {
+
+        Page<FoodItemSoldTopResponse> result = foodItemService.getTopFoodItems(n, page, size);
+        return ResponseEntity.ok(result);
+    }
+
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_PARTNER')")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteFoodItem(@PathVariable("id") Long foodItemId) {

@@ -113,14 +113,45 @@ public class SupplierInfoController {
         }
     }
 
+    // Phương thức cập nhật tọa độ cho nhà cung cấp
+    @PutMapping("/update_location/{supplierId}")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_PARTNER')")
+    public ResponseEntity<Map<String, String>> updateSupplierLocation(
+            @PathVariable Long supplierId,
+            @RequestParam double latitude,
+            @RequestParam double longitude) {
+        try {
+            supplierInfoService.updateLocation(supplierId, latitude, longitude);
+
+            // Trả về JSON với status thành công
+            Map<String, String> response = new HashMap<>();
+            response.put("status", "success");
+            response.put("message", "Supplier location updated successfully");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            // Trả về lỗi nếu có
+            Map<String, String> response = new HashMap<>();
+            response.put("status", "failed");
+            response.put("errorMessage", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
 
     @GetMapping("/get_all_suppliers")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_PARTNER','ROLE_CUSTOMER')")
+<<<<<<< HEAD
+    public ResponseEntity<SupplierInfoResponseList> getAllSuppliers(
+            @RequestParam(defaultValue = "")String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int limit){
+        PageRequest pageRequest = PageRequest.of(page, limit);
+=======
     public ResponseEntity<SupplierInfoResponseList> getAllProducts(
             @RequestParam(defaultValue = "")String keyword,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size){
         PageRequest pageRequest = PageRequest.of(page, size);
+>>>>>>> c77244965587553ccd9823af85798509abdc29c0
         Page<SupplierInfoResponse> supplierInfoResponsePage = supplierInfoService.getAllSuppliers(keyword, pageRequest);
         int totalPages = supplierInfoResponsePage.getTotalPages();
         List<SupplierInfoResponse> supplierResponseList = supplierInfoResponsePage.getContent();
@@ -162,5 +193,22 @@ public class SupplierInfoController {
                 .map(SupplierInfoResponse::fromSupplierInfo)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(supplierInfoResponses);
+    }
+
+    @PutMapping("/block/{supplierId}/{status}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<String> blockOrEnable(
+            @Valid @PathVariable long supplierId,
+            @Valid @PathVariable int status
+    ) {
+        try {
+            supplierInfoService.blockOrEnable(supplierId, status);
+            String message = status > 0 ? "Successfully enabled the user." : "Successfully blocked the user.";
+            return ResponseEntity.ok().body(message);
+        } catch (DataNotFoundException e) {
+            return ResponseEntity.badRequest().body("User not found.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }

@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalTime;
 import java.util.HashMap;
@@ -57,6 +58,7 @@ public class SupplierInfoService implements ISupplierInfoService {
         }
         newSupplierInfo.setTotalReviewCount(0);
         newSupplierInfo.setTotalReviewCount(0);
+        newSupplierInfo.setStatus(1);
         existingUser.setFirstLogin(false);
         return supplierInfoRepository.save(newSupplierInfo);
     }
@@ -93,7 +95,13 @@ public class SupplierInfoService implements ISupplierInfoService {
                 existingSupplier.setSupplierType(existingSupplierType);
             }
 
+            if (supplierInfoDTO.getLatitude() !=0){
+                existingSupplier.setLatitude(supplierInfoDTO.getLatitude());
+            }
 
+            if (supplierInfoDTO.getLongitude() !=0){
+                existingSupplier.setLongitude(supplierInfoDTO.getLongitude());
+            }
 
              supplierInfoRepository.save(existingSupplier);
         }
@@ -108,6 +116,17 @@ public class SupplierInfoService implements ISupplierInfoService {
             existingSupplier.setCloseTime(closeTime);
             supplierInfoRepository.save(existingSupplier);
         }
+    }
+
+    // Phương thức cập nhật tọa độ
+    @Override
+    public void updateLocation(Long supplierId, double latitude, double longitude) throws DataNotFoundException {
+        SupplierInfo supplier = supplierInfoRepository.findById(supplierId)
+                .orElseThrow(() -> new DataNotFoundException("Supplier not found"));
+
+        supplier.setLatitude(latitude);
+        supplier.setLongitude(longitude);
+        supplierInfoRepository.save(supplier);
     }
 
     public SupplierInfo getSupplierInfo(Long id) throws DataNotFoundException {
@@ -143,4 +162,14 @@ public class SupplierInfoService implements ISupplierInfoService {
             return supplierData;
         });
     }
+
+    @Override
+    @Transactional
+    public void blockOrEnable(Long supplierId, int status) throws DataNotFoundException {
+        SupplierInfo supplierInfo = supplierInfoRepository.findById(supplierId)
+                .orElseThrow(() -> new DataNotFoundException("Supplier not found"));
+        supplierInfo.setStatus(status);
+        supplierInfoRepository.save(supplierInfo);
+    }
+
 }

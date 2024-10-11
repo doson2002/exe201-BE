@@ -35,10 +35,13 @@ public class SupplierInfo {
     private String imgUrl = "";
 
     @Column(name = "total_star_rating")
-    private double totalStarRating;
+    private double totalStarRating = 0;
 
     @Column(name = "total_review_count")
-    private int totalReviewCount;
+    private int totalReviewCount =0;
+
+    @Column(name = "cash")
+    private double cash = 0;
 
     @ManyToOne
     @JoinColumn(name = "supplier_type_id")
@@ -51,4 +54,14 @@ public class SupplierInfo {
     @Column(name = "close_time")
     private LocalTime closeTime = LocalTime.of(0, 0, 0); // Đóng cửa lúc 00:00:00
 
+    // Thêm biến để lưu tọa độ
+    @Column(name = "latitude")
+    private double latitude = 0;
+
+
+    @Column(name = "longitude")
+    private double longitude = 0;
+
+    @Column(name = "status")
+    private int status = 1;
 }

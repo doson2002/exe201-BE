@@ -40,6 +40,7 @@ public class FoodOrderService implements IFoodOrderService{
         foodOrder.setStatus(foodOrderDTO.getStatus());
         foodOrder.setPaymentMethod(foodOrderDTO.getPaymentMethod());
         foodOrder.setSupplierInfo(existingSupplier);
+        foodOrder.setShippingFee(foodOrderDTO.getShippingFee());
         foodOrder.setUser(ExistingCustomer);
         double totalPrice = 0;
         for (OrderRequestDTO orderRequest : orderRequests){
