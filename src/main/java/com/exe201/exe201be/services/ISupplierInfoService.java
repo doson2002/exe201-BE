@@ -27,4 +27,6 @@ public interface ISupplierInfoService {
 
     void updateLocation(Long supplierId, double latitude, double longitude) throws DataNotFoundException;
     Page<Map<String, Object>> getTopSuppliers(Pageable pageable);
+
+    void blockOrEnable(Long supplierId, int status) throws DataNotFoundException;
 }

@@ -54,6 +54,8 @@ public class SupplierInfoResponse {
     @JsonProperty(value = "longitude")
     private double longitude;
 
+    private int status;
+
 
 
     public static SupplierInfoResponse fromSupplierInfo(SupplierInfo supplierInfo) {
@@ -70,6 +72,7 @@ public class SupplierInfoResponse {
                 .openTime(supplierInfo.getOpenTime())
                 .latitude(supplierInfo.getLatitude())
                 .longitude(supplierInfo.getLongitude())
+                .status(supplierInfo.getStatus())
                 .user(supplierInfo.getUser())
                 .build();
         return supplierInfoResponse;

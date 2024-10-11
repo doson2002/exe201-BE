@@ -186,4 +186,21 @@ public class SupplierInfoController {
                 .collect(Collectors.toList());
         return ResponseEntity.ok(supplierInfoResponses);
     }
+
+    @PutMapping("/block/{supplierId}/{status}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<String> blockOrEnable(
+            @Valid @PathVariable long supplierId,
+            @Valid @PathVariable int status
+    ) {
+        try {
+            supplierInfoService.blockOrEnable(supplierId, status);
+            String message = status > 0 ? "Successfully enabled the user." : "Successfully blocked the user.";
+            return ResponseEntity.ok().body(message);
+        } catch (DataNotFoundException e) {
+            return ResponseEntity.badRequest().body("User not found.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }

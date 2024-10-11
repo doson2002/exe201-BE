@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalTime;
 import java.util.HashMap;
@@ -57,6 +58,7 @@ public class SupplierInfoService implements ISupplierInfoService {
         }
         newSupplierInfo.setTotalReviewCount(0);
         newSupplierInfo.setTotalReviewCount(0);
+        newSupplierInfo.setStatus(1);
         existingUser.setFirstLogin(false);
         return supplierInfoRepository.save(newSupplierInfo);
     }
@@ -160,4 +162,14 @@ public class SupplierInfoService implements ISupplierInfoService {
             return supplierData;
         });
     }
+
+    @Override
+    @Transactional
+    public void blockOrEnable(Long supplierId, int status) throws DataNotFoundException {
+        SupplierInfo supplierInfo = supplierInfoRepository.findById(supplierId)
+                .orElseThrow(() -> new DataNotFoundException("Supplier not found"));
+        supplierInfo.setStatus(status);
+        supplierInfoRepository.save(supplierInfo);
+    }
+
 }

@@ -58,6 +58,10 @@ public class SupplierInfo {
     @Column(name = "latitude")
     private double latitude = 0;
 
+
     @Column(name = "longitude")
     private double longitude = 0;
+
+    @Column(name = "status")
+    private int status = 1;
 }
