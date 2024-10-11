@@ -18,19 +18,15 @@ public class FirebaseConfig {
         // Sử dụng getResourceAsStream thay vì FileInputStream
         InputStream serviceAccount = getClass().getClassLoader().getResourceAsStream("exe201-c1658-firebase-adminsdk-k6tip-1b5a951916.json");
 
-
         if (serviceAccount == null) {
             throw new FileNotFoundException("File not found: exe201-c1658-firebase-adminsdk-k6tip-1b5a951916.json");
         }
-
 
         FirebaseOptions options = new FirebaseOptions.Builder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                 .setStorageBucket("exe201-c1658.appspot.com") // Thay <your-project-id> bằng ID dự án của bạn
                 .build();
 
-
         return FirebaseApp.initializeApp(options);
-
     }
 }
