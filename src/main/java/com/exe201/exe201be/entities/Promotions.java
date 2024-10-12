@@ -21,15 +21,19 @@ public class Promotions {
     private String code;
 
     @Column(name = "discount_percentage")
-    private double discountPercentage;
+    private double discountPercentage = 0;
 
     @Column(name = "fixed_discount_amount")
-    private Long fixedDiscountAmount;
+    private double fixedDiscountAmount = 0;
 
-    @Column(name = "start_date")
-    private Date startDate;
+    @Column(name = "description", columnDefinition = "TEXT")
+    private String description = "";
 
-    @Column(name = "end_date")
-    private Date endDate;
+    @Column(name = "status")
+    private boolean status;
+
+    @ManyToOne
+    @JoinColumn(name = "supplier_id")
+    private SupplierInfo supplierInfo;
 
 }

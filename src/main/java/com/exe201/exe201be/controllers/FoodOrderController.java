@@ -14,6 +14,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,10 +24,10 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -95,6 +98,55 @@ public class FoodOrderController {
 
 
 
+    @GetMapping("/get_food_order_by_supplier_for_admin/{userId}")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_PARTNER','ROLE_CUSTOMER')")
+    public ResponseEntity<?> getFoodOrdersByUserIdPaging(
+            @PathVariable Long userId,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate,
+            @RequestParam(defaultValue = "orderTime") String sortBy, // Field to sort by
+            @RequestParam(defaultValue = "desc") String sortDirection, // Sorting direction (asc/desc)
+            @RequestParam(defaultValue = "0") int page, // Page number (0-indexed)
+            @RequestParam(defaultValue = "10") int size) throws ParseException { // Page size
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        sdf.setLenient(false); // Thiết lập để không cho phép định dạng không chính xác
+        Date start;
+        Date end;
+        // Kiểm tra và phân tích ngày bắt đầu và ngày kết thúc
+        if (startDate != null) {
+            start = sdf.parse(startDate);
+        } else {
+            throw new IllegalArgumentException("Start date is required.");
+        }
+
+        if (endDate != null) {
+            end = sdf.parse(endDate);
+        } else {
+            throw new IllegalArgumentException("End date is required.");
+        }
+
+        // Kiểm tra xem ngày bắt đầu có trước ngày kết thúc không
+            if (start.after(end)) {
+                throw new IllegalArgumentException("Start date must be before or equal to end date.");
+            }
+
+
+        // Convert sortDirection to Sort.Direction
+        Sort.Direction direction = sortDirection.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
+
+        // Create Pageable object with sorting
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
+
+        // Get paginated and sorted food orders
+        Page<FoodOrder> foodOrders = foodOrderService.getFoodOrdersByUserIdPaging(userId, status, start, end, pageable);
+
+        // Map từ FoodOrder sang FoodOrderResponseAdmin
+        Page<FoodOrderResponseAdmin> response = foodOrders.map(FoodOrderResponseAdmin::fromFoodOrders);
+
+        return ResponseEntity.ok(response);
+    }
 
 
     @PutMapping("/update_order_status/{orderId}")

@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import javax.annotation.Nullable;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -36,5 +38,16 @@ public interface FoodOrderRepository extends JpaRepository<FoodOrder, Long> {
             "GROUP BY f.supplierInfo " +
             "ORDER BY COUNT(f) DESC")
     Page<Object[]> findTopSuppliersByOrderCount(Pageable pageable);
+
+
+    @Query("SELECT f FROM FoodOrder f WHERE f.user.id = :userId " +
+            "AND (:status IS NULL OR f.status = :status) " +
+            "AND DATE(f.orderTime) BETWEEN :startDate AND :endDate")
+
+    Page<FoodOrder> findByUserIdAndStatusAndDateRange(@Param("userId") Long userId,
+                                                      @Param("status") String status,
+                                                      @Nullable @Param("startDate") Date startDate,
+                                                      @Nullable @Param("endDate") Date endDate,
+                                                      Pageable pageable);
 
 }
