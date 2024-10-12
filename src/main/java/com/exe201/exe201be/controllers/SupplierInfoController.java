@@ -139,19 +139,11 @@ public class SupplierInfoController {
 
     @GetMapping("/get_all_suppliers")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_PARTNER','ROLE_CUSTOMER')")
-<<<<<<< HEAD
-    public ResponseEntity<SupplierInfoResponseList> getAllSuppliers(
-            @RequestParam(defaultValue = "")String keyword,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int limit){
-        PageRequest pageRequest = PageRequest.of(page, limit);
-=======
     public ResponseEntity<SupplierInfoResponseList> getAllProducts(
             @RequestParam(defaultValue = "")String keyword,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size){
         PageRequest pageRequest = PageRequest.of(page, size);
->>>>>>> c77244965587553ccd9823af85798509abdc29c0
         Page<SupplierInfoResponse> supplierInfoResponsePage = supplierInfoService.getAllSuppliers(keyword, pageRequest);
         int totalPages = supplierInfoResponsePage.getTotalPages();
         List<SupplierInfoResponse> supplierResponseList = supplierInfoResponsePage.getContent();

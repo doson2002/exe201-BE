@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -139,7 +140,9 @@ public class FoodOrderService implements IFoodOrderService{
         return foodOrderRepository.findByUser_Id(userId);
     }
 
-
+    public Page<FoodOrder> getFoodOrdersByUserIdPaging(Long userId, String status, Date startDate, Date endDate, Pageable pageable) {
+        return foodOrderRepository.findByUserIdAndStatusAndDateRange(userId, status, startDate, endDate, pageable);
+    }
 
     @Transactional
     public void updateOrderStatus(long orderId,String orderStatus) throws DataNotFoundException {
