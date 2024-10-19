@@ -32,6 +32,11 @@ public interface UserRepository extends JpaRepository<Users,Long> {
     @Query("SELECT u FROM Users u WHERE u.role.id = :roleId ")
     List<Users> findByRoleId(@Param("roleId") Long roleId);
 
+    @Query("SELECT u FROM Users u WHERE u.role.id = :roleId " +
+            "AND (:keyword IS NULL OR :keyword = '' OR u.phoneNumber LIKE %:keyword% " +
+            "OR u.email LIKE %:keyword% OR u.fullName LIKE %:keyword%)")
+    Page<Users> findByRoleIdAndKeyword(@Param("roleId") Long roleId, @Param("keyword") String keyword, Pageable pageable);
+
     @Transactional
     @Modifying
     @Query("update Users u set u.password = ?2 where u.email = ?1")

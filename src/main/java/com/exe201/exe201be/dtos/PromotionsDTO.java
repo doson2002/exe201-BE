@@ -24,4 +24,7 @@ public class PromotionsDTO {
 
     private boolean status;
 
+    @JsonProperty("promotion_type")
+    private int promotionType;
+
 }

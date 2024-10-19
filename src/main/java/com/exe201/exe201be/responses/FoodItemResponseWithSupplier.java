@@ -32,6 +32,9 @@ public class FoodItemResponseWithSupplier {
     @JsonProperty(value = "supplierInfo")
     private SupplierInfo supplierInfo;
 
+    @JsonProperty(value = "quantity_inventory")
+    private int quantityInventory;
+
     public static FoodItemResponseWithSupplier fromFoodItem(FoodItem foodItem) {
 
 
@@ -40,6 +43,7 @@ public class FoodItemResponseWithSupplier {
                 .foodName(foodItem.getFoodName())
                 .price(foodItem.getPrice())
                 .imageUrl(foodItem.getImgUrl())
+                .quantityInventory(foodItem.getInventoryQuantity())
                 .quantityAdd(1)
                 .supplierInfo(foodItem.getSupplierInfo())
                 .build();

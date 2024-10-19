@@ -1,10 +1,7 @@
 package com.exe201.exe201be.services;
 
 import com.exe201.exe201be.dtos.PromotionsDTO;
-import com.exe201.exe201be.entities.FoodOrder;
-import com.exe201.exe201be.entities.FoodOrderPromotion;
-import com.exe201.exe201be.entities.Promotions;
-import com.exe201.exe201be.entities.SupplierInfo;
+import com.exe201.exe201be.entities.*;
 import com.exe201.exe201be.exceptions.DataNotFoundException;
 import com.exe201.exe201be.repositories.FoodOrderPromotionRepository;
 import com.exe201.exe201be.repositories.FoodOrderRepository;
@@ -41,6 +38,7 @@ public class PromotionService implements IPromotionService {
                 .description(promotionsDTO.getDescription())
                 .status(promotionsDTO.isStatus())
                 .supplierInfo(supplierInfo)
+                .promotionType(promotionsDTO.getPromotionType())
                 .build();
         return promotionsRepository.save(promotions);
     }
@@ -50,7 +48,7 @@ public class PromotionService implements IPromotionService {
         return promotionsRepository.searchPromotions(supplierInfoId, code, pageable);
     }
 
-    public double applyPromotion(Long foodOrderId, Long promotionId, double totalPrice) throws DataNotFoundException {
+    public void applyPromotion(Long foodOrderId, Long promotionId) throws DataNotFoundException {
         Promotions promotion = promotionsRepository.findById(promotionId)
                 .orElseThrow(()->new DataNotFoundException("promotion not found"));
         FoodOrder foodOrder = foodOrderRepository.findById(foodOrderId)
@@ -59,10 +57,19 @@ public class PromotionService implements IPromotionService {
         foodOrderPromotion.setPromotion(promotion);
         foodOrderPromotion.setFoodOrder(foodOrder);
         foodOrderPromotionRepository.save(foodOrderPromotion);
-        double newTotalPrice = totalPrice - (promotion.getDiscountPercentage()*totalPrice + promotion.getFixedDiscountAmount());
 
-        return newTotalPrice;
+
     }
+
+    public void updateStatus(Long id, boolean status) throws DataNotFoundException {
+        Promotions existingPromotion = promotionsRepository.findById(id)
+                .orElseThrow(() -> new DataNotFoundException("Promotion cannot find with id" + id));
+        if(existingPromotion!=null){
+            existingPromotion.setStatus(status);
+            promotionsRepository.save(existingPromotion);
+        }
+    }
+
     private String generateRandomCode(int length) {
         SecureRandom random = new SecureRandom();
         String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";

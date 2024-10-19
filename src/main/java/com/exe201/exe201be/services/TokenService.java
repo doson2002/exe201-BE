@@ -82,6 +82,8 @@ public class TokenService implements ITokenService{
         existingToken.setToken(token);
         existingToken.setRefreshToken(UUID.randomUUID().toString());
         existingToken.setRefreshExpirationDate(LocalDateTime.now().plusSeconds(expirationRefreshToken));
+        // Lưu token đã được làm mới vào cơ sở dữ liệu
+        tokenRepository.save(existingToken);
         return existingToken;
     }
 

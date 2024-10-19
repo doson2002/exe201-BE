@@ -8,4 +8,6 @@ import org.springframework.data.domain.Page;
 public interface IPromotionService {
     Promotions createPromotion(PromotionsDTO promotionsDTO) throws DataNotFoundException;
     Page<Promotions> getAllPromotions(int page, int size, Long supplierInfoId, String code);
+    void updateStatus(Long id, boolean status) throws DataNotFoundException;
+    void applyPromotion(Long foodOrderId, Long promotionId) throws DataNotFoundException;
 }

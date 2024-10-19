@@ -3,6 +3,7 @@ package com.exe201.exe201be.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -54,6 +55,12 @@ public class FoodOrder {
     private int paymentStatus;
 
     @OneToMany(mappedBy = "foodOrder", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<FoodOrderItem> foodOrderItems;
+    private List<FoodOrderItem> foodOrderItems = new ArrayList<>();
 
+    // Phương thức để tính tổng số lượng đã bán
+    public int getTotalSoldItems() {
+        return foodOrderItems.stream()
+                .mapToInt(FoodOrderItem::getQuantity) // Giả sử FoodOrderItem có phương thức getQuantity
+                .sum();
+    }
 }

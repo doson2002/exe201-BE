@@ -2,6 +2,7 @@ package com.exe201.exe201be.repositories;
 
 import com.exe201.exe201be.entities.FoodOrder;
 import com.exe201.exe201be.entities.FoodOrderItem;
+import com.exe201.exe201be.responses.FoodItemReportResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -24,6 +25,8 @@ public interface FoodOrderRepository extends JpaRepository<FoodOrder, Long> {
 
     @Query("SELECT o FROM FoodOrder o WHERE DATE(o.orderTime) = :orderDate")
     List<FoodOrder> findByOrderTime(@Param("orderDate") Date orderDate);
+
+
 
     // Query cho khoảng thời gian nhưng chỉ so sánh theo ngày
     @Query("SELECT o FROM FoodOrder o WHERE DATE(o.orderTime) BETWEEN :startDate AND :endDate AND o.supplierInfo.id = :supplierInfoId")
@@ -50,4 +53,27 @@ public interface FoodOrderRepository extends JpaRepository<FoodOrder, Long> {
                                                       @Nullable @Param("endDate") Date endDate,
                                                       Pageable pageable);
 
+
+    @Query("SELECT fo.supplierInfo.id, COUNT(fo), fo.supplierInfo.restaurantName, fo.supplierInfo.imgUrl " +
+            "FROM FoodOrder fo " +
+            "GROUP BY fo.supplierInfo.id, fo.supplierInfo.restaurantName, fo.supplierInfo.imgUrl")
+    List<Object[]> countOrdersBySupplier();
+
+    @Query("SELECT COUNT(fo) FROM FoodOrder fo")
+    Long countTotalOrders();
+
+
+    @Query("SELECT foi.foodItem.id AS id, " +
+            "foi.foodItem.foodName AS foodName, " +
+            "foi.foodItem.imgUrl AS imgUrl, " +
+            "SUM(foi.quantity) AS quantity " +
+            "FROM FoodOrder fo " +
+            "JOIN fo.foodOrderItems foi " +
+            "WHERE DATE(fo.orderTime) BETWEEN :startDate AND :endDate " +
+            "AND fo.supplierInfo.id = :supplierInfoId " + // Thêm điều kiện lọc theo supplierInfoId
+            "GROUP BY foi.foodItem.id, foi.foodItem.foodName, foi.foodItem.imgUrl " +
+            "ORDER BY SUM(foi.quantity) DESC")
+    List<Object[]> findTopSellingFoodItems(@Param("startDate") Date startDate,
+                                           @Param("endDate") Date endDate,
+                                           @Param("supplierInfoId") Long supplierInfoId);
 }

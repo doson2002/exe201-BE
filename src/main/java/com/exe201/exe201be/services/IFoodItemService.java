@@ -25,7 +25,7 @@ public interface IFoodItemService {
     void deleteFoodItem(Long foodItemId);
     List<FoodItem> getFoodItemBySupplierId(Long supplierId);
 
-    List<FoodItem> getFoodItemByFoodTypeId(Long foodTypeId);
+    List<FoodItem> getFoodItemByFoodTypeId(Long foodTypeId, String keyword);
     Page<SupplierWithFoodItemsResponse> getAllFoodItemGroupedBySupplier(String keyword, Pageable pageable);
 
     List<String> getAllFoodItemNames(String keyword);

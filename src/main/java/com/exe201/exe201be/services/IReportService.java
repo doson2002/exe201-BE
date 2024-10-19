@@ -2,6 +2,7 @@ package com.exe201.exe201be.services;
 
 import com.exe201.exe201be.entities.FoodItem;
 import com.exe201.exe201be.responses.FoodItemReportResponse;
+import com.exe201.exe201be.responses.SupplierOrderPercentageResponse;
 
 import java.util.Date;
 import java.util.List;
@@ -18,10 +19,16 @@ public interface IReportService {
 
     Map<String, Object> getUserCountAndPercentageChangeByDate(Date date);
 
+    Map<String, Object> getTotalRevenueAndPercentageChangeByDateForPartner(Long supplierId, Date date);
+    Map<String, Object> getTotalOrderCountAndPercentageChangeByDateForPartner(Long supplierId, Date date);
     Map<String, Object> getTotalProductSoldAndPercentageChangeByDate(Date date);
     Map<String, Object> getTotalOrderCountAndPercentageChangeByDate(Date date);
 
     Map<String, Object> getTotalRevenueAndPercentageChangeByDate(Date date);
 
     Map<String, Map<String, Double>> getTotalRevenueForAdminByDateRange(Date startDate, Date endDate);
+
+    List<SupplierOrderPercentageResponse> getOrderCountAndPercentageBySupplier(int n);
+
+    List<FoodItemReportResponse> getTopSellingProductsByDateRange(Date startDate, Date endDate, Long supplierInfoId, int limit);
 }

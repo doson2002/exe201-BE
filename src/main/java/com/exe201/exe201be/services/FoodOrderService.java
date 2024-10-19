@@ -8,6 +8,7 @@ import com.exe201.exe201be.exceptions.DataNotFoundException;
 import com.exe201.exe201be.repositories.*;
 import com.exe201.exe201be.responses.FoodOrderDetailResponse;
 import com.exe201.exe201be.responses.FoodOrderItemResponse;
+import com.exe201.exe201be.responses.SupplierOrderPercentageResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -137,7 +138,7 @@ public class FoodOrderService implements IFoodOrderService{
 
 
     public List<FoodOrder> getFoodOrdersByUserId(Long userId){
-        return foodOrderRepository.findByUser_Id(userId);
+        return foodOrderRepository. findByUser_Id(userId);
     }
 
     public Page<FoodOrder> getFoodOrdersByUserIdPaging(Long userId, String status, Date startDate, Date endDate, Pageable pageable) {
@@ -195,5 +196,8 @@ public class FoodOrderService implements IFoodOrderService{
         // Xóa FoodOrder
         foodOrderRepository.deleteById(orderId);
     }
+
+
+
 
 }

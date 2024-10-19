@@ -20,6 +20,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
@@ -58,6 +60,11 @@ public class FoodOrderController {
                     request.getFoodOrderDTO()
             );
             CreateOrderResponse response = new CreateOrderResponse("Order Created successfully", foodOrder);
+            // Log thêm thông tin người dùng và quyền
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            System.out.println("User: " + authentication.getName());
+            System.out.println("Authorities: " + authentication.getAuthorities());
+
             return ResponseEntity.ok(response);
         } catch (DataNotFoundException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
