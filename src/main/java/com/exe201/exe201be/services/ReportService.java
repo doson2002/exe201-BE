@@ -7,6 +7,7 @@ import com.exe201.exe201be.repositories.FoodItemRepository;
 import com.exe201.exe201be.repositories.FoodOrderRepository;
 import com.exe201.exe201be.repositories.UserRepository;
 import com.exe201.exe201be.responses.FoodItemReportResponse;
+import com.exe201.exe201be.responses.SupplierOrderPercentageResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -49,7 +50,7 @@ public class ReportService implements IReportService {
 
             // Tính tổng doanh thu cho ngày hiện tại theo phương thức thanh toán
             double onlineTotalRevenue = foodOrderRepository.findByOrderTime(currentDate).stream()
-                    .filter(order -> "banking".equals(order.getPaymentMethod()) && order.getPaymentStatus() == 1)
+                    .filter(order -> "transfer".equals(order.getPaymentMethod()) && order.getPaymentStatus() == 1)
                     .mapToDouble(FoodOrder::getTotalPrice)
                     .sum();
 
@@ -103,6 +104,64 @@ public class ReportService implements IReportService {
 
         return  orders.size();
     }
+    public Map<String, Object> getTotalOrderCountAndPercentageChangeByDateForPartner(Long supplierId, Date date) {
+        Map<String, Object> result = new HashMap<>();
+        // Tính tổng số lượng đơn hàng của ngày hiện tại
+        int todayOrderCount = getTotalOrderCountByDate(date, supplierId);
+
+        // Lấy ngày hôm qua
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.add(Calendar.DATE, -1);
+        Date yesterday = cal.getTime();
+
+        // Tính tổng số lượng đơn hàng của ngày hôm qua
+        int yesterdayOrderCount = getTotalOrderCountByDate(yesterday, supplierId);
+
+        // Tính phần trăm thay đổi
+        double percentageChange;
+        if (yesterdayOrderCount == 0) {
+            percentageChange = 100.0;  // Giả sử là tăng trưởng 100% nếu ngày hôm qua không có đơn hàng nào
+        } else {
+            percentageChange = ((double) (todayOrderCount - yesterdayOrderCount) / yesterdayOrderCount) * 100;
+        }
+
+        // Thêm dữ liệu vào kết quả trả về
+        result.put("todayOrderCount", todayOrderCount);
+        result.put("percentageChange", percentageChange);
+
+        return result;
+    }
+    public Map<String, Object> getTotalRevenueAndPercentageChangeByDateForPartner(Long supplierId, Date date) {
+        Map<String, Object> result = new HashMap<>();
+
+        // Tính tổng doanh thu của ngày hiện tại
+        double todayRevenue = getTotalRevenueByDate(date, supplierId);
+
+        // Lấy ngày hôm qua
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.add(Calendar.DATE, -1);
+        Date yesterday = cal.getTime();
+
+        // Tính tổng doanh thu của ngày hôm qua
+        double yesterdayRevenue = getTotalRevenueByDate(yesterday, supplierId);
+
+        // Tính phần trăm thay đổi
+        double percentageChange;
+        if (yesterdayRevenue == 0) {
+            percentageChange = 100.0;  // Giả sử là tăng trưởng 100% nếu ngày hôm qua không có doanh thu nào
+        } else {
+            percentageChange = ((todayRevenue - yesterdayRevenue) / yesterdayRevenue) * 100;
+        }
+
+        // Thêm dữ liệu vào kết quả trả về
+        result.put("todayRevenue", todayRevenue);
+        result.put("percentageChange", percentageChange);
+
+        return result;
+    }
+
 
     public Map<String, Object> getTotalRevenueAndPercentageChangeByDate(Date date) {
         Map<String, Object> result = new HashMap<>();
@@ -178,6 +237,8 @@ public class ReportService implements IReportService {
     }
 
 
+
+
     private int getTotalProductSoldByDateForAdmin(Date date) {
         // Tìm tất cả đơn hàng trong thời gian date
         List<FoodOrder> orders = foodOrderRepository.findByOrderTime(date);
@@ -246,4 +307,55 @@ public class ReportService implements IReportService {
         return resultMap;
     }
 
+    public List<SupplierOrderPercentageResponse> getOrderCountAndPercentageBySupplier(int n) {
+        List<Object[]> result = foodOrderRepository.countOrdersBySupplier();
+        Long totalOrders = foodOrderRepository.countTotalOrders();
+
+        List<SupplierOrderPercentageResponse> supplierOrderList = new ArrayList<>();
+        for (Object[] row : result) {
+            Long supplierId = (Long) row[0];
+            Long orderCount = (Long) row[1];
+            String supplierName = (String) row[2];  // Lấy tên supplier
+            String imgUrl = (String) row[3];        // Lấy imgUrl của supplier
+            double percentage = (double) orderCount / totalOrders * 100;
+
+
+            // Làm tròn percentage và chuyển sang kiểu int để loại bỏ phần thập phân
+            int roundedPercentage = (int) Math.round(percentage);
+
+            supplierOrderList.add(new SupplierOrderPercentageResponse(supplierId, orderCount, roundedPercentage,supplierName, imgUrl));
+        }
+
+        // Sắp xếp theo số lượng đơn hàng giảm dần
+        supplierOrderList.sort((o1, o2) -> o2.getOrderCount().compareTo(o1.getOrderCount()));
+
+        // Giới hạn kết quả theo số lượng supplier n muốn hiển thị
+        return supplierOrderList.stream().limit(n).collect(Collectors.toList());
+    }
+
+    public List<FoodItemReportResponse> getTopSellingProductsByDateRange(Date startDate, Date endDate, Long supplierInfoId, int limit) {
+        List<Object[]> results = foodOrderRepository.findTopSellingFoodItems(startDate, endDate, supplierInfoId);
+
+        // Giới hạn kết quả theo tham số limit
+        List<FoodItemReportResponse> topSellingProducts = new ArrayList<>();
+        for (int i = 0; i < Math.min(results.size(), limit); i++) {
+            Object[] result = results.get(i);
+            Long foodId = (Long) result[0];
+            String foodName = (String) result[1];
+            String imgUrl = (String) result[2]; // Lấy imgUrl từ kết quả
+            int quantitySold = ((Number) result[3]).intValue(); // Chuyển đổi thành int
+
+            // Tạo FoodItemReportResponse
+            FoodItemReportResponse foodItemReportResponse = FoodItemReportResponse.builder()
+                    .id(foodId)
+                    .foodName(foodName)
+                    .imageUrl(imgUrl)
+                    .quantitySold(quantitySold)
+                    .build();
+
+            topSellingProducts.add(foodItemReportResponse);
+        }
+
+        return topSellingProducts;
+    }
 }

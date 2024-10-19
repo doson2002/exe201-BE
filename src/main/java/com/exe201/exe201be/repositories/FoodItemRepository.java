@@ -1,6 +1,7 @@
 package com.exe201.exe201be.repositories;
 
 import com.exe201.exe201be.entities.FoodItem;
+import com.exe201.exe201be.entities.FoodOrder;
 import com.exe201.exe201be.entities.ForgotPassword;
 import com.exe201.exe201be.entities.SupplierInfo;
 import org.springframework.data.domain.Page;
@@ -10,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 
 @Repository
@@ -34,6 +36,10 @@ public interface FoodItemRepository extends JpaRepository<FoodItem, Long> {
     List<FoodItem> findTopSellingProducts(@Param("limit") int limit);
 
     List<FoodItem> findBySupplierInfo_IdAndIsOffered(Long supplierId, int isOffered);
+
+
+    @Query("SELECT o FROM FoodOrder o WHERE DATE(o.orderTime) BETWEEN :startDate AND :endDate AND o.supplierInfo.id = :supplierInfoId")
+    List<FoodOrder> findByOrderTimeBetweenAndSupplierInfo_Id(@Param("startDate") Date startDate, @Param("endDate") Date endDate, @Param("supplierInfoId") Long supplierInfoId);
 
 
 }

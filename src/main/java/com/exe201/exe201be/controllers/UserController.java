@@ -21,6 +21,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -80,7 +81,7 @@ public class UserController {
                     .phone(userDetail.getPhoneNumber())
                     .gender(userDetail.getGender())
                     .imgUrl(userDetail.getImgUrl())
-                    .firstLogin(userDetail.getFirstLogin())
+                    .firstLogin(false)
                     .roles(userDetail.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList())
                     .id(userDetail.getId())
                     .build());
@@ -146,13 +147,23 @@ public class UserController {
         return ResponseEntity.ok(UserResponse.fromUser(user));
     }
 
-    @GetMapping("/get_user_by_role")
+    @GetMapping("/get_user_by_role/{roleId}")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_MANAGER')")
-    public ResponseEntity<?>getUsersByRole(
-            @RequestParam(defaultValue = "") Long roleId)
-            throws DataNotFoundException {
-        List<Users> users =userService.getUserByRole(roleId);
-        return ResponseEntity.ok(users);
+    public ResponseEntity<?> getUsersByRole(
+            @PathVariable Long roleId,
+            @RequestParam(defaultValue = "") String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending()); // Thêm sắp xếp theo id
+        Page<Users> usersPage;
+
+        try {
+            usersPage = userService.getUserByRole(roleId, keyword, pageable);
+            return ResponseEntity.ok(usersPage);
+        } catch (DataNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
     }
 
 
@@ -182,21 +193,34 @@ public class UserController {
 //        userService.deleteUser(userId);
 //        return new ResponseEntity<>("Users deleted successfully", HttpStatus.OK);
 //    }
-    @PutMapping("/block/{userId}/{active}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<String> blockOrEnable(
-            @Valid @PathVariable long userId,
-            @Valid @PathVariable int active
-    ) {
-        try {
-            userService.blockOrEnable(userId, active > 0);
-            String message = active > 0 ? "Successfully enabled the user." : "Successfully blocked the user.";
-            return ResponseEntity.ok().body(message);
-        } catch (DataNotFoundException e) {
-            return ResponseEntity.badRequest().body("User not found.");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+@PutMapping("/block/{userId}/{active}")
+@PreAuthorize("hasRole('ROLE_ADMIN')")
+public ResponseEntity<?> blockOrEnable(
+        @Valid @PathVariable long userId,
+        @Valid @PathVariable int active
+) {
+    Map<String, String> response = new HashMap<>();
+    try {
+        userService.blockOrEnable(userId, active > 0);
+
+        // Trả về JSON với status thành công
+
+        response.put("status", "success");
+        String message = active > 0 ? "Successfully enabled the user." : "Successfully blocked the user.";
+        response.put("message", message);
+        return ResponseEntity.ok(response);
+    } catch (DataNotFoundException e) {
+        // Trả về lỗi nếu không tìm thấy người dùng
+        response.put("status", "failed");
+        response.put("errorMessage", "User not found.");
+        return ResponseEntity.badRequest().body(response);
+    } catch (Exception e) {
+        // Trả về lỗi nếu có
+        response.put("status", "failed");
+        response.put("errorMessage", e.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
+}
+
 
 }

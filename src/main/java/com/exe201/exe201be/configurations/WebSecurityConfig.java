@@ -44,6 +44,8 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                                     String.format("%s/forgot_password/verify_otp/**", apiPrefix),
                                     String.format("%s/forgot_password/change_password/**", apiPrefix),
                                     String.format("%s/payment/vn-pay-callback/**", apiPrefix),
+                                    String.format("%s/token/refresh-token", apiPrefix),
+
                                     "/api-docs",
                                     "/api-docs/**",
                                     "/swagger-resources",

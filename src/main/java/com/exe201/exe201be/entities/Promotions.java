@@ -32,6 +32,9 @@ public class Promotions {
     @Column(name = "status")
     private boolean status;
 
+    @Column(name = "promotion_type")
+    private int promotionType;      //1 là system , 2 là partner
+
     @ManyToOne
     @JoinColumn(name = "supplier_id")
     private SupplierInfo supplierInfo;

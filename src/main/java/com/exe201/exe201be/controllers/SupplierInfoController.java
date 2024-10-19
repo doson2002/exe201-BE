@@ -142,8 +142,12 @@ public class SupplierInfoController {
     public ResponseEntity<SupplierInfoResponseList> getAllProducts(
             @RequestParam(defaultValue = "")String keyword,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size){
-        PageRequest pageRequest = PageRequest.of(page, size);
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,  // Đặt sortBy mặc định là "id"
+            @RequestParam(defaultValue = "asc") String sortOrder) { // Tham số sortOrder vẫn giữ nguyên)
+        Sort sort = sortOrder.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+
+        PageRequest pageRequest = PageRequest.of(page, size,sort);
         Page<SupplierInfoResponse> supplierInfoResponsePage = supplierInfoService.getAllSuppliers(keyword, pageRequest);
         int totalPages = supplierInfoResponsePage.getTotalPages();
         List<SupplierInfoResponse> supplierResponseList = supplierInfoResponsePage.getContent();
@@ -189,18 +193,32 @@ public class SupplierInfoController {
 
     @PutMapping("/block/{supplierId}/{status}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<String> blockOrEnable(
+    public ResponseEntity<?> blockOrEnable(
             @Valid @PathVariable long supplierId,
             @Valid @PathVariable int status
     ) {
         try {
             supplierInfoService.blockOrEnable(supplierId, status);
+
+            // Trả về JSON với status thành công
+            Map<String, String> response = new HashMap<>();
+            response.put("status", "success");
             String message = status > 0 ? "Successfully enabled the user." : "Successfully blocked the user.";
-            return ResponseEntity.ok().body(message);
+            response.put("message", message);
+            return ResponseEntity.ok(response);
         } catch (DataNotFoundException e) {
-            return ResponseEntity.badRequest().body("User not found.");
+            // Trả về lỗi nếu không tìm thấy người dùng
+            Map<String, String> response = new HashMap<>();
+            response.put("status", "failed");
+            response.put("errorMessage", "User not found.");
+            return ResponseEntity.badRequest().body(response);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            // Trả về lỗi nếu có
+            Map<String, String> response = new HashMap<>();
+            response.put("status", "failed");
+            response.put("errorMessage", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
+
 }

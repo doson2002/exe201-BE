@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -106,13 +107,20 @@ public class UserService implements IUserService{
     public Users getUser(Long id) throws DataNotFoundException {
         return userRepository.findById(id).orElseThrow(()->new DataNotFoundException("User not found"));
     }
-    public List<Users> getUserByRole(Long roleId) throws DataNotFoundException {
-        if (!roleRepository.existsById(roleId)) {
-            throw new DataNotFoundException("Role not found with id " + roleId);
-        }
-
-        return userRepository.findByRoleId(roleId);
+//    public List<Users> getUserByRole(Long roleId) throws DataNotFoundException {
+//        if (!roleRepository.existsById(roleId)) {
+//            throw new DataNotFoundException("Role not found with id " + roleId);
+//        }
+//
+//        return userRepository.findByRoleId(roleId);
+//    }
+public Page<Users> getUserByRole(Long roleId, String keyword, Pageable pageable) throws DataNotFoundException {
+    if (!roleRepository.existsById(roleId)) {
+        throw new DataNotFoundException("Role not found with id " + roleId);
     }
+
+    return userRepository.findByRoleIdAndKeyword(roleId, keyword, pageable);
+}
 
     @Override
         public boolean updateUser(long id, UpdateUserDTO updateUserDTO) throws Exception {

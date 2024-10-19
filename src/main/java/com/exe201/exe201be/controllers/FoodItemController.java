@@ -187,8 +187,9 @@ public class FoodItemController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_PARTNER','ROLE_CUSTOMER')")
     @GetMapping("/get_food_item_by_food_type/{foodTypeId}")
-    public ResponseEntity<?> getFoodItemByFoodTypeId(@PathVariable Long foodTypeId) {
-        List<FoodItem> foodItemList = foodItemService.getFoodItemByFoodTypeId(foodTypeId);
+    public ResponseEntity<?> getFoodItemByFoodTypeId(@PathVariable Long foodTypeId
+                                                    ,@RequestParam(defaultValue = "") String keyword) {
+        List<FoodItem> foodItemList = foodItemService.getFoodItemByFoodTypeId(foodTypeId,keyword);
         List<FoodItemResponse> foodItemResponseList = foodItemList.stream()
                 .map(FoodItemResponse::fromFoodItem)
                 .collect(Collectors.toList());

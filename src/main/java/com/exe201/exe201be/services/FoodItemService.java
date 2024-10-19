@@ -160,13 +160,15 @@ public class FoodItemService implements IFoodItemService{
     }
 
 
-    public List<FoodItem> getFoodItemByFoodTypeId(Long foodTypeId) {
+    public List<FoodItem> getFoodItemByFoodTypeId(Long foodTypeId, String keyword) {
         // Tìm danh sách FoodItemType liên kết với foodTypeId
         List<FoodItemType> foodItemTypes = foodItemTypeRepository.findByFoodTypeId(foodTypeId);
 
         // Lấy danh sách FoodItem từ FoodItemType
         List<FoodItem> foodItems = foodItemTypes.stream()
                 .map(FoodItemType::getFoodItem)
+                .filter(foodItem -> keyword == null || keyword.isEmpty() ||
+                        foodItem.getFoodName().toLowerCase().contains(keyword.toLowerCase()))
                 .collect(Collectors.toList());
 
         return foodItems;
